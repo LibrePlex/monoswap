@@ -1,0 +1,398 @@
+{
+  "version": "0.0.0",
+  "name": "libreplex_monoswap",
+  "instructions": [
+    {
+      "name": "CreateSwap",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "Account to pay for the creation of the account"
+          ]
+        },
+        {
+          "name": "namespace",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "Indexing namespace of the marker"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "Authority to transfer incoming asset"
+          ]
+        },
+        {
+          "name": "swapMarker",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Escrows the asset and encodes state about the swap"
+          ]
+        },
+        {
+          "name": "swapMarkerAux",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Auxiliary account for the swap marker: e.g. ATA"
+          ]
+        },
+        {
+          "name": "incomingAsset",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The asset to be escrowed for the swap"
+          ]
+        },
+        {
+          "name": "incomingAssetAux",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "Associated account for the incoming asset, e.g. token account"
+          ]
+        },
+        {
+          "name": "externalAsset",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "External asset connected to the incoming asset"
+          ]
+        },
+        {
+          "name": "incomingAssetProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Transfer Program ID of the incoming asset"
+          ]
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The SPL associated token program account program"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "System program account"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "createSwapArgs",
+          "type": {
+            "defined": "CreateSwapArgs"
+          }
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 0
+      }
+    },
+    {
+      "name": "Swap",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "Authority to transfer incoming asset"
+          ]
+        },
+        {
+          "name": "swapMarker",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Escrows the asset and encodes state about the swap"
+          ]
+        },
+        {
+          "name": "escrowedAsset",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The asset to be escrowed for the swap"
+          ]
+        },
+        {
+          "name": "incomingAsset",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "External asset connected to the incoming asset"
+          ]
+        },
+        {
+          "name": "swapMarkerAux",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Auxiliary account for the swap marker: e.g. ATA"
+          ]
+        },
+        {
+          "name": "escrowedAssetAux",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "Associated account for the incoming asset, e.g. token account"
+          ]
+        },
+        {
+          "name": "incomingAssetAux",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "Associated account for the external asset, e.g. token account"
+          ]
+        },
+        {
+          "name": "escrowedAssetProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Transfer Program ID of the incoming asset"
+          ]
+        },
+        {
+          "name": "incomingAssetProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Transfer Program ID of the external asset"
+          ]
+        }
+      ],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 1
+      }
+    }
+  ],
+  "accounts": [
+    {
+      "name": "SwapMarker",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "namespace",
+            "type": "publicKey"
+          },
+          {
+            "name": "escrowedAsset",
+            "type": "publicKey"
+          },
+          {
+            "name": "externalAsset",
+            "type": "publicKey"
+          },
+          {
+            "name": "escrowedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "externalAmount",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SwapSeeds",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "namespace",
+            "type": "publicKey"
+          },
+          {
+            "name": "asset1",
+            "type": "publicKey"
+          },
+          {
+            "name": "asset2",
+            "type": "publicKey"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "CreateSwapArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "incomingAmount",
+            "type": "u64"
+          },
+          {
+            "name": "externalAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Key",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Uninitialized"
+          },
+          {
+            "name": "SwapMarker"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AssetType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Invalid"
+          },
+          {
+            "name": "Nifty"
+          },
+          {
+            "name": "SplToken"
+          },
+          {
+            "name": "MplxLegacy"
+          },
+          {
+            "name": "MplxCore"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 0,
+      "name": "DeserializationError",
+      "msg": "Error deserializing an account"
+    },
+    {
+      "code": 1,
+      "name": "SerializationError",
+      "msg": "Error serializing an account"
+    },
+    {
+      "code": 2,
+      "name": "InvalidProgramOwner",
+      "msg": "Invalid program owner. This likely mean the provided account does not exist"
+    },
+    {
+      "code": 3,
+      "name": "InvalidPda",
+      "msg": "Invalid PDA derivation"
+    },
+    {
+      "code": 4,
+      "name": "ExpectedEmptyAccount",
+      "msg": "Expected empty account"
+    },
+    {
+      "code": 5,
+      "name": "ExpectedNonEmptyAccount",
+      "msg": "Expected non empty account"
+    },
+    {
+      "code": 6,
+      "name": "ExpectedSignerAccount",
+      "msg": "Expected signer account"
+    },
+    {
+      "code": 7,
+      "name": "ExpectedWritableAccount",
+      "msg": "Expected writable account"
+    },
+    {
+      "code": 8,
+      "name": "AccountMismatch",
+      "msg": "Account mismatch"
+    },
+    {
+      "code": 9,
+      "name": "InvalidAccountKey",
+      "msg": "Invalid account key"
+    },
+    {
+      "code": 10,
+      "name": "NumericalOverflow",
+      "msg": "Numerical overflow"
+    },
+    {
+      "code": 11,
+      "name": "InvalidSystemProgram",
+      "msg": "Invalid system program account"
+    },
+    {
+      "code": 12,
+      "name": "IninitalizedMint",
+      "msg": "IninitalizedMint"
+    },
+    {
+      "code": 13,
+      "name": "MissingNiftyGroup",
+      "msg": "Missing Nifty Group account"
+    },
+    {
+      "code": 14,
+      "name": "MissingIncomingAssetAux",
+      "msg": "Missing incoming asset aux"
+    },
+    {
+      "code": 15,
+      "name": "MissingExternalAssetAux",
+      "msg": "Missing external asset aux"
+    },
+    {
+      "code": 16,
+      "name": "UnsupportedAssetType",
+      "msg": "Unsupported asset type"
+    }
+  ],
+  "metadata": {
+    "origin": "shank",
+    "address": "F7CfUwFLRk4J1wbzknbYff7ywhT6r871FCSwTHRWfr1G",
+    "binaryVersion": "0.4.2",
+    "libVersion": "^0.4.2"
+  }
+}
