@@ -3,7 +3,7 @@ use super::*;
 pub fn process_swap<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
     let ctx = SwapAccounts::context(accounts)?;
 
-    let swap_marker = SwapMarker::load(ctx.accounts.swap_marker)?;
+    let mut swap_marker = SwapMarker::load(ctx.accounts.swap_marker)?;
 
     // Check signer.
     assert_signer("authority", ctx.accounts.authority)?;
@@ -140,5 +140,17 @@ pub fn process_swap<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
         }
     }
 
-    Ok(())
+    // Update SwapMarker state.
+    // Accounts have swapped, so update the escrowed and external assets.
+    // This allows indexing to figure out what swaps are available for any given asset.
+    std::mem::swap(
+        &mut swap_marker.escrowed_amount,
+        &mut swap_marker.external_amount,
+    );
+    std::mem::swap(
+        &mut swap_marker.escrowed_amount,
+        &mut swap_marker.external_amount,
+    );
+
+    swap_marker.save(ctx.accounts.swap_marker)
 }
