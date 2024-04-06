@@ -18,8 +18,8 @@ pub fn detect_asset(asset_info: &AccountInfo) -> Result<AssetType, ProgramError>
         nifty_asset::ID => {
             let data = asset_info.try_borrow_data().unwrap();
 
-            // Must have the expected amount of data and the correct standard.
-            if data.len() >= Asset::LEN && data[0] == NiftyStandard::NonFungible as u8 {
+            // Must have the expected amount of data and the correct discriminator and standard.
+            if data.len() >= Asset::LEN && data[2] == NiftyStandard::NonFungible as u8 {
                 AssetType::Nifty
             }
             // Invalid account.

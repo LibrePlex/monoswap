@@ -214,18 +214,18 @@ export class MissingIncomingAssetAuxError extends ProgramError {
 codeToErrorMap.set(0xe, MissingIncomingAssetAuxError);
 nameToErrorMap.set('MissingIncomingAssetAux', MissingIncomingAssetAuxError);
 
-/** MissingExternalAssetAux: Missing external asset aux */
-export class MissingExternalAssetAuxError extends ProgramError {
-  override readonly name: string = 'MissingExternalAssetAux';
+/** MissingEscrowedAssetAux: Missing escrowed asset aux */
+export class MissingEscrowedAssetAuxError extends ProgramError {
+  override readonly name: string = 'MissingEscrowedAssetAux';
 
   readonly code: number = 0xf; // 15
 
   constructor(program: Program, cause?: Error) {
-    super('Missing external asset aux', program, cause);
+    super('Missing escrowed asset aux', program, cause);
   }
 }
-codeToErrorMap.set(0xf, MissingExternalAssetAuxError);
-nameToErrorMap.set('MissingExternalAssetAux', MissingExternalAssetAuxError);
+codeToErrorMap.set(0xf, MissingEscrowedAssetAuxError);
+nameToErrorMap.set('MissingEscrowedAssetAux', MissingEscrowedAssetAuxError);
 
 /** UnsupportedAssetType: Unsupported asset type */
 export class UnsupportedAssetTypeError extends ProgramError {

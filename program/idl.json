@@ -112,6 +112,14 @@
       "name": "Swap",
       "accounts": [
         {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "Account to pay for any accounts that need to be created"
+          ]
+        },
+        {
           "name": "authority",
           "isMut": false,
           "isSigner": true,
@@ -137,7 +145,7 @@
         },
         {
           "name": "incomingAsset",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "External asset connected to the incoming asset"
@@ -153,7 +161,7 @@
         },
         {
           "name": "escrowedAssetAux",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "isOptional": true,
           "docs": [
@@ -162,7 +170,7 @@
         },
         {
           "name": "incomingAssetAux",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "isOptional": true,
           "docs": [
@@ -183,6 +191,22 @@
           "isSigner": false,
           "docs": [
             "Transfer Program ID of the external asset"
+          ]
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The SPL associated token program account program"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "System program account"
           ]
         }
       ],
@@ -380,8 +404,8 @@
     },
     {
       "code": 15,
-      "name": "MissingExternalAssetAux",
-      "msg": "Missing external asset aux"
+      "name": "MissingEscrowedAssetAux",
+      "msg": "Missing escrowed asset aux"
     },
     {
       "code": 16,

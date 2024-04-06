@@ -55,9 +55,9 @@ pub enum MonoswapError {
     /// 14 (0xE) - Missing incoming asset aux
     #[error("Missing incoming asset aux")]
     MissingIncomingAssetAux,
-    /// 15 (0xF) - Missing external asset aux
-    #[error("Missing external asset aux")]
-    MissingExternalAssetAux,
+    /// 15 (0xF) - Missing escrowed asset aux
+    #[error("Missing escrowed asset aux")]
+    MissingEscrowedAssetAux,
     /// 16 (0x10) - Unsupported asset type
     #[error("Unsupported asset type")]
     UnsupportedAssetType,

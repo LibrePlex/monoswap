@@ -37,8 +37,8 @@ export const enum MonoswapProgramErrorCode {
   MISSING_NIFTY_GROUP = 0xd, // 13
   /** MissingIncomingAssetAux: Missing incoming asset aux */
   MISSING_INCOMING_ASSET_AUX = 0xe, // 14
-  /** MissingExternalAssetAux: Missing external asset aux */
-  MISSING_EXTERNAL_ASSET_AUX = 0xf, // 15
+  /** MissingEscrowedAssetAux: Missing escrowed asset aux */
+  MISSING_ESCROWED_ASSET_AUX = 0xf, // 15
   /** UnsupportedAssetType: Unsupported asset type */
   UNSUPPORTED_ASSET_TYPE = 0x10, // 16
 }
@@ -127,9 +127,9 @@ if (__DEV__) {
       'MissingIncomingAssetAux',
       `Missing incoming asset aux`,
     ],
-    [MonoswapProgramErrorCode.MISSING_EXTERNAL_ASSET_AUX]: [
-      'MissingExternalAssetAux',
-      `Missing external asset aux`,
+    [MonoswapProgramErrorCode.MISSING_ESCROWED_ASSET_AUX]: [
+      'MissingEscrowedAssetAux',
+      `Missing escrowed asset aux`,
     ],
     [MonoswapProgramErrorCode.UNSUPPORTED_ASSET_TYPE]: [
       'UnsupportedAssetType',

@@ -26,6 +26,7 @@ import {
   ReadonlyAccount,
   ReadonlySignerAccount,
   WritableAccount,
+  WritableSignerAccount,
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import { MONOSWAP_PROGRAM_ADDRESS } from '../programs';
@@ -33,6 +34,7 @@ import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
 export type SwapInstruction<
   TProgram extends string = typeof MONOSWAP_PROGRAM_ADDRESS,
+  TAccountPayer extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
   TAccountSwapMarker extends string | IAccountMeta<string> = string,
   TAccountEscrowedAsset extends string | IAccountMeta<string> = string,
@@ -42,11 +44,19 @@ export type SwapInstruction<
   TAccountIncomingAssetAux extends string | IAccountMeta<string> = string,
   TAccountEscrowedAssetProgram extends string | IAccountMeta<string> = string,
   TAccountIncomingAssetProgram extends string | IAccountMeta<string> = string,
+  TAccountAssociatedTokenProgram extends string | IAccountMeta<string> = string,
+  TAccountSystemProgram extends
+    | string
+    | IAccountMeta<string> = '11111111111111111111111111111111',
   TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
     [
+      TAccountPayer extends string
+        ? WritableSignerAccount<TAccountPayer> &
+            IAccountSignerMeta<TAccountPayer>
+        : TAccountPayer,
       TAccountAuthority extends string
         ? ReadonlySignerAccount<TAccountAuthority> &
             IAccountSignerMeta<TAccountAuthority>
@@ -58,16 +68,16 @@ export type SwapInstruction<
         ? WritableAccount<TAccountEscrowedAsset>
         : TAccountEscrowedAsset,
       TAccountIncomingAsset extends string
-        ? ReadonlyAccount<TAccountIncomingAsset>
+        ? WritableAccount<TAccountIncomingAsset>
         : TAccountIncomingAsset,
       TAccountSwapMarkerAux extends string
         ? WritableAccount<TAccountSwapMarkerAux>
         : TAccountSwapMarkerAux,
       TAccountEscrowedAssetAux extends string
-        ? ReadonlyAccount<TAccountEscrowedAssetAux>
+        ? WritableAccount<TAccountEscrowedAssetAux>
         : TAccountEscrowedAssetAux,
       TAccountIncomingAssetAux extends string
-        ? ReadonlyAccount<TAccountIncomingAssetAux>
+        ? WritableAccount<TAccountIncomingAssetAux>
         : TAccountIncomingAssetAux,
       TAccountEscrowedAssetProgram extends string
         ? ReadonlyAccount<TAccountEscrowedAssetProgram>
@@ -75,6 +85,12 @@ export type SwapInstruction<
       TAccountIncomingAssetProgram extends string
         ? ReadonlyAccount<TAccountIncomingAssetProgram>
         : TAccountIncomingAssetProgram,
+      TAccountAssociatedTokenProgram extends string
+        ? ReadonlyAccount<TAccountAssociatedTokenProgram>
+        : TAccountAssociatedTokenProgram,
+      TAccountSystemProgram extends string
+        ? ReadonlyAccount<TAccountSystemProgram>
+        : TAccountSystemProgram,
       ...TRemainingAccounts,
     ]
   >;
@@ -105,6 +121,7 @@ export function getSwapInstructionDataCodec(): Codec<
 }
 
 export type SwapInput<
+  TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSwapMarker extends string = string,
   TAccountEscrowedAsset extends string = string,
@@ -114,7 +131,11 @@ export type SwapInput<
   TAccountIncomingAssetAux extends string = string,
   TAccountEscrowedAssetProgram extends string = string,
   TAccountIncomingAssetProgram extends string = string,
+  TAccountAssociatedTokenProgram extends string = string,
+  TAccountSystemProgram extends string = string,
 > = {
+  /** Account to pay for any accounts that need to be created */
+  payer: TransactionSigner<TAccountPayer>;
   /** Authority to transfer incoming asset */
   authority: TransactionSigner<TAccountAuthority>;
   /** Escrows the asset and encodes state about the swap */
@@ -133,9 +154,14 @@ export type SwapInput<
   escrowedAssetProgram: Address<TAccountEscrowedAssetProgram>;
   /** Transfer Program ID of the external asset */
   incomingAssetProgram: Address<TAccountIncomingAssetProgram>;
+  /** The SPL associated token program account program */
+  associatedTokenProgram: Address<TAccountAssociatedTokenProgram>;
+  /** System program account */
+  systemProgram?: Address<TAccountSystemProgram>;
 };
 
 export function getSwapInstruction<
+  TAccountPayer extends string,
   TAccountAuthority extends string,
   TAccountSwapMarker extends string,
   TAccountEscrowedAsset extends string,
@@ -145,8 +171,11 @@ export function getSwapInstruction<
   TAccountIncomingAssetAux extends string,
   TAccountEscrowedAssetProgram extends string,
   TAccountIncomingAssetProgram extends string,
+  TAccountAssociatedTokenProgram extends string,
+  TAccountSystemProgram extends string,
 >(
   input: SwapInput<
+    TAccountPayer,
     TAccountAuthority,
     TAccountSwapMarker,
     TAccountEscrowedAsset,
@@ -155,10 +184,13 @@ export function getSwapInstruction<
     TAccountEscrowedAssetAux,
     TAccountIncomingAssetAux,
     TAccountEscrowedAssetProgram,
-    TAccountIncomingAssetProgram
+    TAccountIncomingAssetProgram,
+    TAccountAssociatedTokenProgram,
+    TAccountSystemProgram
   >
 ): SwapInstruction<
   typeof MONOSWAP_PROGRAM_ADDRESS,
+  TAccountPayer,
   TAccountAuthority,
   TAccountSwapMarker,
   TAccountEscrowedAsset,
@@ -167,25 +199,28 @@ export function getSwapInstruction<
   TAccountEscrowedAssetAux,
   TAccountIncomingAssetAux,
   TAccountEscrowedAssetProgram,
-  TAccountIncomingAssetProgram
+  TAccountIncomingAssetProgram,
+  TAccountAssociatedTokenProgram,
+  TAccountSystemProgram
 > {
   // Program address.
   const programAddress = MONOSWAP_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
+    payer: { value: input.payer ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: false },
     swapMarker: { value: input.swapMarker ?? null, isWritable: true },
     escrowedAsset: { value: input.escrowedAsset ?? null, isWritable: true },
-    incomingAsset: { value: input.incomingAsset ?? null, isWritable: false },
+    incomingAsset: { value: input.incomingAsset ?? null, isWritable: true },
     swapMarkerAux: { value: input.swapMarkerAux ?? null, isWritable: true },
     escrowedAssetAux: {
       value: input.escrowedAssetAux ?? null,
-      isWritable: false,
+      isWritable: true,
     },
     incomingAssetAux: {
       value: input.incomingAssetAux ?? null,
-      isWritable: false,
+      isWritable: true,
     },
     escrowedAssetProgram: {
       value: input.escrowedAssetProgram ?? null,
@@ -195,15 +230,27 @@ export function getSwapInstruction<
       value: input.incomingAssetProgram ?? null,
       isWritable: false,
     },
+    associatedTokenProgram: {
+      value: input.associatedTokenProgram ?? null,
+      isWritable: false,
+    },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
 
+  // Resolve default values.
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+  }
+
   const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
   const instruction = {
     accounts: [
+      getAccountMeta(accounts.payer),
       getAccountMeta(accounts.authority),
       getAccountMeta(accounts.swapMarker),
       getAccountMeta(accounts.escrowedAsset),
@@ -213,11 +260,14 @@ export function getSwapInstruction<
       getAccountMeta(accounts.incomingAssetAux),
       getAccountMeta(accounts.escrowedAssetProgram),
       getAccountMeta(accounts.incomingAssetProgram),
+      getAccountMeta(accounts.associatedTokenProgram),
+      getAccountMeta(accounts.systemProgram),
     ],
     programAddress,
     data: getSwapInstructionDataEncoder().encode({}),
   } as SwapInstruction<
     typeof MONOSWAP_PROGRAM_ADDRESS,
+    TAccountPayer,
     TAccountAuthority,
     TAccountSwapMarker,
     TAccountEscrowedAsset,
@@ -226,7 +276,9 @@ export function getSwapInstruction<
     TAccountEscrowedAssetAux,
     TAccountIncomingAssetAux,
     TAccountEscrowedAssetProgram,
-    TAccountIncomingAssetProgram
+    TAccountIncomingAssetProgram,
+    TAccountAssociatedTokenProgram,
+    TAccountSystemProgram
   >;
 
   return instruction;
@@ -238,24 +290,30 @@ export type ParsedSwapInstruction<
 > = {
   programAddress: Address<TProgram>;
   accounts: {
+    /** Account to pay for any accounts that need to be created */
+    payer: TAccountMetas[0];
     /** Authority to transfer incoming asset */
-    authority: TAccountMetas[0];
+    authority: TAccountMetas[1];
     /** Escrows the asset and encodes state about the swap */
-    swapMarker: TAccountMetas[1];
+    swapMarker: TAccountMetas[2];
     /** The asset to be escrowed for the swap */
-    escrowedAsset: TAccountMetas[2];
+    escrowedAsset: TAccountMetas[3];
     /** External asset connected to the incoming asset */
-    incomingAsset: TAccountMetas[3];
+    incomingAsset: TAccountMetas[4];
     /** Auxiliary account for the swap marker: e.g. ATA */
-    swapMarkerAux: TAccountMetas[4];
+    swapMarkerAux: TAccountMetas[5];
     /** Associated account for the incoming asset, e.g. token account */
-    escrowedAssetAux?: TAccountMetas[5] | undefined;
+    escrowedAssetAux?: TAccountMetas[6] | undefined;
     /** Associated account for the external asset, e.g. token account */
-    incomingAssetAux?: TAccountMetas[6] | undefined;
+    incomingAssetAux?: TAccountMetas[7] | undefined;
     /** Transfer Program ID of the incoming asset */
-    escrowedAssetProgram: TAccountMetas[7];
+    escrowedAssetProgram: TAccountMetas[8];
     /** Transfer Program ID of the external asset */
-    incomingAssetProgram: TAccountMetas[8];
+    incomingAssetProgram: TAccountMetas[9];
+    /** The SPL associated token program account program */
+    associatedTokenProgram: TAccountMetas[10];
+    /** System program account */
+    systemProgram: TAccountMetas[11];
   };
   data: SwapInstructionData;
 };
@@ -268,7 +326,7 @@ export function parseSwapInstruction<
     IInstructionWithAccounts<TAccountMetas> &
     IInstructionWithData<Uint8Array>
 ): ParsedSwapInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 9) {
+  if (instruction.accounts.length < 12) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
   }
@@ -287,6 +345,7 @@ export function parseSwapInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
+      payer: getNextAccount(),
       authority: getNextAccount(),
       swapMarker: getNextAccount(),
       escrowedAsset: getNextAccount(),
@@ -296,6 +355,8 @@ export function parseSwapInstruction<
       incomingAssetAux: getNextOptionalAccount(),
       escrowedAssetProgram: getNextAccount(),
       incomingAssetProgram: getNextAccount(),
+      associatedTokenProgram: getNextAccount(),
+      systemProgram: getNextAccount(),
     },
     data: getSwapInstructionDataDecoder().decode(instruction.data),
   };

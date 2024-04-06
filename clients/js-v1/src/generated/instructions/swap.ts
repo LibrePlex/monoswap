@@ -28,6 +28,8 @@ import {
 
 // Accounts.
 export type SwapInstructionAccounts = {
+  /** Account to pay for any accounts that need to be created */
+  payer?: Signer;
   /** Authority to transfer incoming asset */
   authority?: Signer;
   /** Escrows the asset and encodes state about the swap */
@@ -46,6 +48,10 @@ export type SwapInstructionAccounts = {
   escrowedAssetProgram: PublicKey | Pda;
   /** Transfer Program ID of the external asset */
   incomingAssetProgram: PublicKey | Pda;
+  /** The SPL associated token program account program */
+  associatedTokenProgram: PublicKey | Pda;
+  /** System program account */
+  systemProgram?: PublicKey | Pda;
 };
 
 // Data.
@@ -67,7 +73,7 @@ export function getSwapInstructionDataSerializer(): Serializer<
 
 // Instruction.
 export function swap(
-  context: Pick<Context, 'identity' | 'programs'>,
+  context: Pick<Context, 'identity' | 'payer' | 'programs'>,
   input: SwapInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
@@ -78,56 +84,81 @@ export function swap(
 
   // Accounts.
   const resolvedAccounts = {
-    authority: {
+    payer: {
       index: 0,
+      isWritable: true as boolean,
+      value: input.payer ?? null,
+    },
+    authority: {
+      index: 1,
       isWritable: false as boolean,
       value: input.authority ?? null,
     },
     swapMarker: {
-      index: 1,
+      index: 2,
       isWritable: true as boolean,
       value: input.swapMarker ?? null,
     },
     escrowedAsset: {
-      index: 2,
+      index: 3,
       isWritable: true as boolean,
       value: input.escrowedAsset ?? null,
     },
     incomingAsset: {
-      index: 3,
-      isWritable: false as boolean,
+      index: 4,
+      isWritable: true as boolean,
       value: input.incomingAsset ?? null,
     },
     swapMarkerAux: {
-      index: 4,
+      index: 5,
       isWritable: true as boolean,
       value: input.swapMarkerAux ?? null,
     },
     escrowedAssetAux: {
-      index: 5,
-      isWritable: false as boolean,
+      index: 6,
+      isWritable: true as boolean,
       value: input.escrowedAssetAux ?? null,
     },
     incomingAssetAux: {
-      index: 6,
-      isWritable: false as boolean,
+      index: 7,
+      isWritable: true as boolean,
       value: input.incomingAssetAux ?? null,
     },
     escrowedAssetProgram: {
-      index: 7,
+      index: 8,
       isWritable: false as boolean,
       value: input.escrowedAssetProgram ?? null,
     },
     incomingAssetProgram: {
-      index: 8,
+      index: 9,
       isWritable: false as boolean,
       value: input.incomingAssetProgram ?? null,
+    },
+    associatedTokenProgram: {
+      index: 10,
+      isWritable: false as boolean,
+      value: input.associatedTokenProgram ?? null,
+    },
+    systemProgram: {
+      index: 11,
+      isWritable: false as boolean,
+      value: input.systemProgram ?? null,
     },
   } satisfies ResolvedAccountsWithIndices;
 
   // Default values.
+  if (!resolvedAccounts.payer.value) {
+    resolvedAccounts.payer.value = context.payer;
+  }
   if (!resolvedAccounts.authority.value) {
     resolvedAccounts.authority.value = context.identity;
+  }
+  if (!resolvedAccounts.systemProgram.value) {
+    resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
+      'splSystem',
+      '11111111111111111111111111111111'
+    );
+    resolvedAccounts.systemProgram.isWritable = false;
   }
 
   // Accounts in order.
