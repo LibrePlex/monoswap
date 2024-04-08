@@ -9,12 +9,12 @@ pub enum MonoswapInstruction {
     #[account(1, signer, name="namespace", desc = "Indexing namespace of the marker")]
     #[account(2, signer, name="authority", desc = "Authority to transfer incoming asset")]
     #[account(3, writable, name="swap_marker", desc = "Escrows the asset and encodes state about the swap")]
-    #[account(4, writable, name="swap_marker_aux", desc = "Auxiliary account for the swap marker: e.g. ATA")]
-    #[account(5, name="incoming_asset", desc = "The asset to be escrowed for the swap")]
+    #[account(4, optional, writable, name="swap_marker_aux", desc = "Auxiliary account for the swap marker: e.g. ATA")]
+    #[account(5, writable, name="incoming_asset", desc = "The asset to be escrowed for the swap")]
     #[account(6, writable, optional, name="incoming_asset_aux", desc = "Associated account for the incoming asset, e.g. token account")]
     #[account(7, name="external_asset", desc = "External asset connected to the incoming asset")]
     #[account(8, name="incoming_asset_program", desc = "Transfer Program ID of the incoming asset")]
-    #[account(9, name="associated_token_program", desc = "The SPL associated token program account program")]
+    #[account(9, optional, name="associated_token_program", desc = "The SPL associated token program account program")]
     #[account(10, name="system_program", desc = "System program account")]
     CreateSwap(CreateSwapArgs),
 

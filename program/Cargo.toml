@@ -12,6 +12,8 @@ program-dependencies = [
     "AssetGtQBTSgm5s91d1RAQod5JmaZiJDxqsgtqrZud73",
     "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
     "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+    "SysExL2WDyJi9aRZrXorrjHJut3JwHQ7R9bTyctbNNG",
+    "TokExjvjJmhKaRBShsBAsbSvEWMA1AgUNK7ps4SAc2p",
 ]
 
 [lib]
@@ -21,8 +23,8 @@ crate-type = ["cdylib", "lib"]
 borsh = "^0.10"
 shank = "^0.4.2"
 mpl-token-metadata = "4.1.2"
-nifty-asset = "0.1.2"
-nifty-asset-types = "0.1.0"
+nifty-asset = "0.2.0"
+nifty-asset-types = "0.2.0"
 num-derive = "^0.3"
 num-traits = "^0.2"
 solana-program = "<1.18"

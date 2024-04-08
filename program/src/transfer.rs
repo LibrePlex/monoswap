@@ -67,7 +67,7 @@ pub fn check_and_transfer_nifty(params: TransferNiftyParams<'_, '_>) -> ProgramR
         asset: asset_info,
         signer: signer_info,
         recipient: recipient_info,
-        group_asset: group_asset_info_opt,
+        group: group_asset_info_opt,
     }
     .invoke_signed(signer_seeds)?;
     Ok(())

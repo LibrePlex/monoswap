@@ -13,12 +13,6 @@ kinobi.update(
   })
 );
 
-// Update accounts.
-// kinobi.update(
-//   k.updateAccountsVisitor({
-//   })
-// );
-
 // Update instructions.
 kinobi.update(
   k.updateInstructionsVisitor({
@@ -28,7 +22,7 @@ kinobi.update(
   })
 );
 
-// // Set account discriminators.
+// Set account discriminators.
 // const key = (name) => ({ field: "key", value: k.enumValueNode("Key", name) });
 // kinobi.update(
 //   k.setAccountDiscriminatorFromFieldVisitor({

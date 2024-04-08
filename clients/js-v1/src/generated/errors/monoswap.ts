@@ -227,17 +227,30 @@ export class MissingEscrowedAssetAuxError extends ProgramError {
 codeToErrorMap.set(0xf, MissingEscrowedAssetAuxError);
 nameToErrorMap.set('MissingEscrowedAssetAux', MissingEscrowedAssetAuxError);
 
+/** MissingSwapMarkerAux: Missing swap marker aux */
+export class MissingSwapMarkerAuxError extends ProgramError {
+  override readonly name: string = 'MissingSwapMarkerAux';
+
+  readonly code: number = 0x10; // 16
+
+  constructor(program: Program, cause?: Error) {
+    super('Missing swap marker aux', program, cause);
+  }
+}
+codeToErrorMap.set(0x10, MissingSwapMarkerAuxError);
+nameToErrorMap.set('MissingSwapMarkerAux', MissingSwapMarkerAuxError);
+
 /** UnsupportedAssetType: Unsupported asset type */
 export class UnsupportedAssetTypeError extends ProgramError {
   override readonly name: string = 'UnsupportedAssetType';
 
-  readonly code: number = 0x10; // 16
+  readonly code: number = 0x11; // 17
 
   constructor(program: Program, cause?: Error) {
     super('Unsupported asset type', program, cause);
   }
 }
-codeToErrorMap.set(0x10, UnsupportedAssetTypeError);
+codeToErrorMap.set(0x11, UnsupportedAssetTypeError);
 nameToErrorMap.set('UnsupportedAssetType', UnsupportedAssetTypeError);
 
 /**

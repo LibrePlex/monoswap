@@ -56,7 +56,10 @@ pub enum MonoswapError {
     /// 15 - Missing external asset aux
     #[error("Missing escrowed asset aux")]
     MissingEscrowedAssetAux,
-    /// 16 - Unsupported asset type
+    /// 16 - Missing swap marker aux
+    #[error("Missing swap marker aux")]
+    MissingSwapMarkerAux,
+    /// 17 - Unsupported asset type
     #[error("Unsupported asset type")]
     UnsupportedAssetType,
 }

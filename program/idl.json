@@ -41,13 +41,14 @@
           "name": "swapMarkerAux",
           "isMut": true,
           "isSigner": false,
+          "isOptional": true,
           "docs": [
             "Auxiliary account for the swap marker: e.g. ATA"
           ]
         },
         {
           "name": "incomingAsset",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "The asset to be escrowed for the swap"
@@ -82,6 +83,7 @@
           "name": "associatedTokenProgram",
           "isMut": false,
           "isSigner": false,
+          "isOptional": true,
           "docs": [
             "The SPL associated token program account program"
           ]
@@ -409,6 +411,11 @@
     },
     {
       "code": 16,
+      "name": "MissingSwapMarkerAux",
+      "msg": "Missing swap marker aux"
+    },
+    {
+      "code": 17,
       "name": "UnsupportedAssetType",
       "msg": "Unsupported asset type"
     }

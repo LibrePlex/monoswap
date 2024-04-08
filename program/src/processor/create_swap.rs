@@ -77,7 +77,10 @@ pub fn process_create_swap<'a>(
                     Some(account_info) => account_info,
                     None => return Err(MonoswapError::MissingIncomingAssetAux.into()),
                 },
-                destination_ata_info: ctx.accounts.swap_marker_aux,
+                destination_ata_info: match ctx.accounts.swap_marker_aux {
+                    Some(account_info) => account_info,
+                    None => return Err(MonoswapError::MissingSwapMarkerAux.into()),
+                },
                 amount: args.incoming_amount,
                 signer_seeds: &[],
             };

@@ -39,8 +39,10 @@ export const enum MonoswapProgramErrorCode {
   MISSING_INCOMING_ASSET_AUX = 0xe, // 14
   /** MissingEscrowedAssetAux: Missing escrowed asset aux */
   MISSING_ESCROWED_ASSET_AUX = 0xf, // 15
+  /** MissingSwapMarkerAux: Missing swap marker aux */
+  MISSING_SWAP_MARKER_AUX = 0x10, // 16
   /** UnsupportedAssetType: Unsupported asset type */
-  UNSUPPORTED_ASSET_TYPE = 0x10, // 16
+  UNSUPPORTED_ASSET_TYPE = 0x11, // 17
 }
 
 export class MonoswapProgramError extends Error {
@@ -130,6 +132,10 @@ if (__DEV__) {
     [MonoswapProgramErrorCode.MISSING_ESCROWED_ASSET_AUX]: [
       'MissingEscrowedAssetAux',
       `Missing escrowed asset aux`,
+    ],
+    [MonoswapProgramErrorCode.MISSING_SWAP_MARKER_AUX]: [
+      'MissingSwapMarkerAux',
+      `Missing swap marker aux`,
     ],
     [MonoswapProgramErrorCode.UNSUPPORTED_ASSET_TYPE]: [
       'UnsupportedAssetType',

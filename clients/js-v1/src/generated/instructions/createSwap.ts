@@ -40,7 +40,7 @@ export type CreateSwapInstructionAccounts = {
   /** Escrows the asset and encodes state about the swap */
   swapMarker: PublicKey | Pda;
   /** Auxiliary account for the swap marker: e.g. ATA */
-  swapMarkerAux: PublicKey | Pda;
+  swapMarkerAux?: PublicKey | Pda;
   /** The asset to be escrowed for the swap */
   incomingAsset: PublicKey | Pda;
   /** Associated account for the incoming asset, e.g. token account */
@@ -50,7 +50,7 @@ export type CreateSwapInstructionAccounts = {
   /** Transfer Program ID of the incoming asset */
   incomingAssetProgram: PublicKey | Pda;
   /** The SPL associated token program account program */
-  associatedTokenProgram: PublicKey | Pda;
+  associatedTokenProgram?: PublicKey | Pda;
   /** System program account */
   systemProgram?: PublicKey | Pda;
 };
@@ -131,7 +131,7 @@ export function createSwap(
     },
     incomingAsset: {
       index: 5,
-      isWritable: false as boolean,
+      isWritable: true as boolean,
       value: input.incomingAsset ?? null,
     },
     incomingAssetAux: {

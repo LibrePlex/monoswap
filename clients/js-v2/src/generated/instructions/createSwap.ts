@@ -79,7 +79,7 @@ export type CreateSwapInstruction<
         ? WritableAccount<TAccountSwapMarkerAux>
         : TAccountSwapMarkerAux,
       TAccountIncomingAsset extends string
-        ? ReadonlyAccount<TAccountIncomingAsset>
+        ? WritableAccount<TAccountIncomingAsset>
         : TAccountIncomingAsset,
       TAccountIncomingAssetAux extends string
         ? WritableAccount<TAccountIncomingAssetAux>
@@ -162,7 +162,7 @@ export type CreateSwapInput<
   /** Escrows the asset and encodes state about the swap */
   swapMarker: Address<TAccountSwapMarker>;
   /** Auxiliary account for the swap marker: e.g. ATA */
-  swapMarkerAux: Address<TAccountSwapMarkerAux>;
+  swapMarkerAux?: Address<TAccountSwapMarkerAux>;
   /** The asset to be escrowed for the swap */
   incomingAsset: Address<TAccountIncomingAsset>;
   /** Associated account for the incoming asset, e.g. token account */
@@ -172,7 +172,7 @@ export type CreateSwapInput<
   /** Transfer Program ID of the incoming asset */
   incomingAssetProgram: Address<TAccountIncomingAssetProgram>;
   /** The SPL associated token program account program */
-  associatedTokenProgram: Address<TAccountAssociatedTokenProgram>;
+  associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
   /** System program account */
   systemProgram?: Address<TAccountSystemProgram>;
   incomingAmount: CreateSwapInstructionDataArgs['incomingAmount'];
@@ -230,7 +230,7 @@ export function getCreateSwapInstruction<
     authority: { value: input.authority ?? null, isWritable: false },
     swapMarker: { value: input.swapMarker ?? null, isWritable: true },
     swapMarkerAux: { value: input.swapMarkerAux ?? null, isWritable: true },
-    incomingAsset: { value: input.incomingAsset ?? null, isWritable: false },
+    incomingAsset: { value: input.incomingAsset ?? null, isWritable: true },
     incomingAssetAux: {
       value: input.incomingAssetAux ?? null,
       isWritable: true,
@@ -318,7 +318,7 @@ export type ParsedCreateSwapInstruction<
     /** Escrows the asset and encodes state about the swap */
     swapMarker: TAccountMetas[3];
     /** Auxiliary account for the swap marker: e.g. ATA */
-    swapMarkerAux: TAccountMetas[4];
+    swapMarkerAux?: TAccountMetas[4] | undefined;
     /** The asset to be escrowed for the swap */
     incomingAsset: TAccountMetas[5];
     /** Associated account for the incoming asset, e.g. token account */
@@ -328,7 +328,7 @@ export type ParsedCreateSwapInstruction<
     /** Transfer Program ID of the incoming asset */
     incomingAssetProgram: TAccountMetas[8];
     /** The SPL associated token program account program */
-    associatedTokenProgram: TAccountMetas[9];
+    associatedTokenProgram?: TAccountMetas[9] | undefined;
     /** System program account */
     systemProgram: TAccountMetas[10];
   };
@@ -366,12 +366,12 @@ export function parseCreateSwapInstruction<
       namespace: getNextAccount(),
       authority: getNextAccount(),
       swapMarker: getNextAccount(),
-      swapMarkerAux: getNextAccount(),
+      swapMarkerAux: getNextOptionalAccount(),
       incomingAsset: getNextAccount(),
       incomingAssetAux: getNextOptionalAccount(),
       externalAsset: getNextAccount(),
       incomingAssetProgram: getNextAccount(),
-      associatedTokenProgram: getNextAccount(),
+      associatedTokenProgram: getNextOptionalAccount(),
       systemProgram: getNextAccount(),
     },
     data: getCreateSwapInstructionDataDecoder().decode(instruction.data),
