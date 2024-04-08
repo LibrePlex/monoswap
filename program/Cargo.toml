@@ -11,6 +11,7 @@ program-id = "F7CfUwFLRk4J1wbzknbYff7ywhT6r871FCSwTHRWfr1G"
 program-dependencies = [
     "AssetGtQBTSgm5s91d1RAQod5JmaZiJDxqsgtqrZud73",
     "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+    "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
 ]
 
 [lib]
