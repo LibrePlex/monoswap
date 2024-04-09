@@ -181,8 +181,6 @@ jobs:
     needs: [changes, generate_clients]
     uses: ./.github/workflows/test-js-client.yml
     secrets: inherit
-    with:
-      client_matrix: ${{ needs.changes.outputs.js_client_matrix }}
 
   test_rust:
     if: ${{ needs.changes.outputs.rust_clients == 'true' }}
@@ -190,8 +188,6 @@ jobs:
     needs: [changes, generate_clients]
     uses: ./.github/workflows/test-rust-client.yml
     secrets: inherit
-    with:
-      client_matrix: ${{ needs.changes.outputs.rust_client_matrix }}
 
   build_rust:
     if: ${{ needs.changes.outputs.rust_clients == 'true' }}
@@ -199,5 +195,3 @@ jobs:
     needs: [changes, generate_clients]
     uses: ./.github/workflows/build-rust-client.yml
     secrets: inherit
-    with:
-      client_matrix: ${{ needs.changes.outputs.rust_client_matrix }}
