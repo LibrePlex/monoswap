@@ -22,18 +22,35 @@ export function findSwapMarkerPda(
 
   // Compare the first byte of asset1 and asset2 and find the smaller one to
   // maintain consistent seed ordering regardless of which asset is incoming versus
-  // escrowed.
+  // escrowed. If the first byte is the same, compare the second byte, and so on.
   const a1Bytes = publicKeySerializer().serialize(seeds.asset1);
   const a2Bytes = publicKeySerializer().serialize(seeds.asset2);
-  const a1 = a1Bytes[0];
-  const a2 = a2Bytes[0];
-  const smaller = a1 < a2 ? a1Bytes : a2Bytes;
-  const larger = a1 < a2 ? a2Bytes : a1Bytes;
 
-  return context.eddsa.findPda(programId, [
-    string({ size: 'variable' }).serialize('swap_marker'),
-    publicKeySerializer().serialize(seeds.namespace),
-    smaller,
-    larger,
-  ]);
+  let pda;
+
+  for (let i = 0; i < a1Bytes.length; i++) {
+    if (a1Bytes[i] < a2Bytes[i]) {
+      pda = context.eddsa.findPda(programId, [
+        string({ size: 'variable' }).serialize('swap_marker'),
+        publicKeySerializer().serialize(seeds.namespace),
+        a1Bytes,
+        a2Bytes,
+      ]);
+      break;
+    } else if (a1Bytes[i] > a2Bytes[i]) {
+      pda = context.eddsa.findPda(programId, [
+        string({ size: 'variable' }).serialize('swap_marker'),
+        publicKeySerializer().serialize(seeds.namespace),
+        a2Bytes,
+        a1Bytes,
+      ]);
+      break;
+    }
+  }
+
+  if (!pda) {
+    throw new Error('Asset1 and Asset2 are the same');
+  }
+
+  return pda;
 }
