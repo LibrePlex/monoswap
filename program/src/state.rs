@@ -31,6 +31,7 @@ pub struct SwapMarker {
     pub bump: u8,
 }
 
+/// A helper function to make it easier to compute the PDA for the swap marker account.
 #[repr(C)]
 #[derive(Clone, BorshSerialize, BorshDeserialize, Debug, ShankAccount)]
 pub struct SwapSeeds<'a> {

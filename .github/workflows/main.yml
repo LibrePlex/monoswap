@@ -19,8 +19,6 @@ jobs:
       program_matrix: ${{ steps.program_matrix.outputs.matrix }}
       js_clients: ${{ steps.changes.outputs.js_clients }}
       rust_clients: ${{ steps.changes.outputs.rust_clients }}
-      js_client_matrix: ${{ steps.js_client_matrix.outputs.matrix }}
-      rust_client_matrix: ${{ steps.rust_client_matrix.outputs.matrix }}
     steps:
       - name: Git checkout
         uses: actions/checkout@v4
@@ -40,23 +38,7 @@ jobs:
         with:
           matrix: ${{ env.PROGRAMS }}
           changes: ${{ steps.changes.outputs.changes }}
-          suffix: _program
-
-      - name: Filter JS client matrix
-        id: js_client_matrix
-        uses: nifty-oss/actions/filter-matrix@v1
-        with:
-          matrix: ${{ env.PROGRAMS }}
-          changes: ${{ steps.changes.outputs.changes }}
-          suffix: _js_client
-
-      - name: Filter Rust client matrix
-        id: rust_client_matrix
-        uses: nifty-oss/actions/filter-matrix@v1
-        with:
-          matrix: ${{ env.PROGRAMS }}
-          changes: ${{ steps.changes.outputs.changes }}
-          suffix: _rust_client
+          suffix: _binary
 
   lint_js:
     name: Lint JS
