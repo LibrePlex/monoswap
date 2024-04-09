@@ -10,6 +10,7 @@ use solana_program::{
 use crate::error::MonoswapError;
 
 pub const LEGACY_TOKEN_PROGRAM_ID: Pubkey = pubkey!("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+pub const TOKEN_PROGRAM_IDS: [Pubkey; 2] = [spl_token_2022::ID, LEGACY_TOKEN_PROGRAM_ID];
 
 #[derive(Clone, BorshSerialize, BorshDeserialize, Debug)]
 pub enum Key {

@@ -92,7 +92,7 @@ pub fn process_swap<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
 
             // Transfer escrowed Nifty asset from the swap marker to the authority signer.
             let transfer_params = TransferNiftyParams {
-                nifty_program_info: ctx.accounts.incoming_asset_program,
+                nifty_program_info: ctx.accounts.escrowed_asset_program,
                 asset_info: ctx.accounts.escrowed_asset,
                 signer_info: ctx.accounts.swap_marker,
                 recipient_info: ctx.accounts.authority,

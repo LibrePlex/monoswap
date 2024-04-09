@@ -46,8 +46,15 @@ jobs:
           version: ${{ inputs.solana || env.SOLANA_VERSION }}
           cache: ${{ env.CACHE }}
 
-      - name: Install Node dependencies for running zx
+      - name: Install Node for running zx
         uses: nifty-oss/actions/install-node-with-pnpm@v1
+        with:
+          folder: ./clients/js-v1
+          cache: ${{ env.CACHE }}
+          key: client-js-v1
+
+      - name: Install Node dependencies
+        uses: nifty-oss/actions/install-node-dependencies@v1
         with:
           folder: ./clients/js-v1
           cache: ${{ env.CACHE }}

@@ -64,6 +64,9 @@ pub enum MonoswapError {
     /// 17 (0x11) - Unsupported asset type
     #[error("Unsupported asset type")]
     UnsupportedAssetType,
+    /// 18 (0x12) - Invalid Token Program
+    #[error("Invalid Token Program")]
+    InvalidTokenProgram,
 }
 
 impl solana_program::program_error::PrintProgramError for MonoswapError {

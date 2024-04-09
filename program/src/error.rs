@@ -62,6 +62,9 @@ pub enum MonoswapError {
     /// 17 - Unsupported asset type
     #[error("Unsupported asset type")]
     UnsupportedAssetType,
+    /// 18 - Invalid Token Program
+    #[error("Invalid Token Program")]
+    InvalidTokenProgram,
 }
 
 impl PrintProgramError for MonoswapError {

@@ -43,6 +43,8 @@ export const enum MonoswapProgramErrorCode {
   MISSING_SWAP_MARKER_AUX = 0x10, // 16
   /** UnsupportedAssetType: Unsupported asset type */
   UNSUPPORTED_ASSET_TYPE = 0x11, // 17
+  /** InvalidTokenProgram: Invalid Token Program */
+  INVALID_TOKEN_PROGRAM = 0x12, // 18
 }
 
 export class MonoswapProgramError extends Error {
@@ -140,6 +142,10 @@ if (__DEV__) {
     [MonoswapProgramErrorCode.UNSUPPORTED_ASSET_TYPE]: [
       'UnsupportedAssetType',
       `Unsupported asset type`,
+    ],
+    [MonoswapProgramErrorCode.INVALID_TOKEN_PROGRAM]: [
+      'InvalidTokenProgram',
+      `Invalid Token Program`,
     ],
   };
 }

@@ -253,6 +253,19 @@ export class UnsupportedAssetTypeError extends ProgramError {
 codeToErrorMap.set(0x11, UnsupportedAssetTypeError);
 nameToErrorMap.set('UnsupportedAssetType', UnsupportedAssetTypeError);
 
+/** InvalidTokenProgram: Invalid Token Program */
+export class InvalidTokenProgramError extends ProgramError {
+  override readonly name: string = 'InvalidTokenProgram';
+
+  readonly code: number = 0x12; // 18
+
+  constructor(program: Program, cause?: Error) {
+    super('Invalid Token Program', program, cause);
+  }
+}
+codeToErrorMap.set(0x12, InvalidTokenProgramError);
+nameToErrorMap.set('InvalidTokenProgram', InvalidTokenProgramError);
+
 /**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors

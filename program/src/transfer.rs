@@ -12,7 +12,7 @@ use spl_token_2022::{
 };
 
 use crate::{
-    assertions::assert_same_pubkeys, processor::MonoswapError, state::LEGACY_TOKEN_PROGRAM_ID,
+    assertions::assert_same_pubkeys, processor::MonoswapError, state::TOKEN_PROGRAM_IDS,
     utils::unpack,
 };
 
@@ -103,16 +103,10 @@ pub fn check_and_transfer_spl(params: TransferSplParams<'_, '_>) -> ProgramResul
 
     // Checks.
     // The incoming asset program is actually one of the SPL token programs.
-    assert_same_pubkeys(
-        "incoming_asset_program",
-        spl_program_info,
-        &spl_token_2022::ID,
-    )
-    .or(assert_same_pubkeys(
-        "incoming_asset_program",
-        spl_program_info,
-        &LEGACY_TOKEN_PROGRAM_ID,
-    ))?;
+    if !TOKEN_PROGRAM_IDS.contains(spl_program_info.key) {
+        msg!("Incoming asset program is not a valid SPL token program");
+        return Err(MonoswapError::InvalidTokenProgram.into());
+    }
 
     // Create destination ata, if necessary.
     if destination_ata_info.data_is_empty() {
