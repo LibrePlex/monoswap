@@ -132,8 +132,8 @@ pub fn process_swap<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
     // Accounts have swapped, so update the escrowed and external assets.
     // This allows indexing to figure out what swaps are available for any given asset.
     std::mem::swap(
-        &mut swap_marker.escrowed_amount,
-        &mut swap_marker.external_amount,
+        &mut swap_marker.escrowed_asset,
+        &mut swap_marker.external_asset,
     );
     std::mem::swap(
         &mut swap_marker.escrowed_amount,

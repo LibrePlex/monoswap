@@ -115,16 +115,16 @@ jobs:
       - name: Install dependencies
         uses: nifty-oss/actions/install-node-dependencies@v1
         with:
-          folder: ./clients/js
+          folder: ./clients/js-v1
           cache: ${{ env.CACHE }}
           key: client-js
 
       - name: Format
-        working-directory: ./clients/js
+        working-directory: ./clients/js-v1
         run: pnpm format
 
       - name: Lint
-        working-directory: ./clients/js
+        working-directory: ./clients/js-v1
         run: pnpm lint
 
   build_programs:
