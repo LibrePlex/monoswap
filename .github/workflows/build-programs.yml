@@ -53,6 +53,13 @@ jobs:
           cache: ${{ env.CACHE }}
           key: client-js-v1
 
+      - name: Install Node root dependencies
+        uses: nifty-oss/actions/install-node-dependencies@v1
+        with:
+          folder: "."
+          cache: ${{ env.CACHE }}
+          key: client-js-v1
+
       - name: Install Node dependencies
         uses: nifty-oss/actions/install-node-dependencies@v1
         with:
