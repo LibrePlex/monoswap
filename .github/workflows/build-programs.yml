@@ -79,8 +79,8 @@ jobs:
 
       - name: Build programs
         shell: bash
-        working-directory: scripts/program
-        run: npx zx build.mjs
+        working-directory: "."
+        run: npx zx ./scripts/program/build.mjs
         env:
           PROGRAMS: ${{ env.PROGRAMS }}
 

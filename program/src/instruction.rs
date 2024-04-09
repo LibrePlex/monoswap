@@ -25,13 +25,14 @@ pub enum MonoswapInstruction {
     #[account(2, writable, name="swap_marker", desc = "Escrows the asset and encodes state about the swap")]
     #[account(3, writable, name="escrowed_asset", desc = "The asset to be escrowed for the swap")]
     #[account(4, writable, name="incoming_asset", desc = "External asset connected to the incoming asset")]
-    #[account(5, writable, name="swap_marker_aux", desc = "Auxiliary account for the swap marker: e.g. ATA")]
-    #[account(6, writable, optional, name="escrowed_asset_aux", desc = "Associated account for the incoming asset, e.g. token account")]
-    #[account(7, writable, optional, name="incoming_asset_aux", desc = "Associated account for the external asset, e.g. token account")]
-    #[account(8, name="escrowed_asset_program", desc = "Transfer Program ID of the incoming asset")]
-    #[account(9, name="incoming_asset_program", desc = "Transfer Program ID of the external asset")]
-    #[account(10, name="associated_token_program", desc = "The SPL associated token program account program")]
-    #[account(11, name="system_program", desc = "System program account")]
+    #[account(5, optional, writable, name="swap_marker_aux_incoming", desc = "Auxiliary account for the swap marker: e.g. ATA")]
+    #[account(6, optional, writable, name="swap_marker_aux_outgoing", desc = "Auxiliary account for the swap marker: e.g. ATA")]
+    #[account(7, writable, optional, name="escrowed_asset_aux", desc = "Associated account for the incoming asset, e.g. token account")]
+    #[account(8, writable, optional, name="incoming_asset_aux", desc = "Associated account for the external asset, e.g. token account")]
+    #[account(9, name="escrowed_asset_program", desc = "Transfer Program ID of the incoming asset")]
+    #[account(10, name="incoming_asset_program", desc = "Transfer Program ID of the external asset")]
+    #[account(11, optional, name="associated_token_program", desc = "The SPL associated token program account program")]
+    #[account(12, name="system_program", desc = "System program account")]
     Swap,
 }
 

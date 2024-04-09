@@ -154,9 +154,19 @@
           ]
         },
         {
-          "name": "swapMarkerAux",
+          "name": "swapMarkerAuxIncoming",
           "isMut": true,
           "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "Auxiliary account for the swap marker: e.g. ATA"
+          ]
+        },
+        {
+          "name": "swapMarkerAuxOutgoing",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
           "docs": [
             "Auxiliary account for the swap marker: e.g. ATA"
           ]
@@ -199,6 +209,7 @@
           "name": "associatedTokenProgram",
           "isMut": false,
           "isSigner": false,
+          "isOptional": true,
           "docs": [
             "The SPL associated token program account program"
           ]

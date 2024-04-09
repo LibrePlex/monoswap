@@ -39,7 +39,9 @@ export type SwapInstructionAccounts = {
   /** External asset connected to the incoming asset */
   incomingAsset: PublicKey | Pda;
   /** Auxiliary account for the swap marker: e.g. ATA */
-  swapMarkerAux: PublicKey | Pda;
+  swapMarkerAuxIncoming?: PublicKey | Pda;
+  /** Auxiliary account for the swap marker: e.g. ATA */
+  swapMarkerAuxOutgoing?: PublicKey | Pda;
   /** Associated account for the incoming asset, e.g. token account */
   escrowedAssetAux?: PublicKey | Pda;
   /** Associated account for the external asset, e.g. token account */
@@ -49,7 +51,7 @@ export type SwapInstructionAccounts = {
   /** Transfer Program ID of the external asset */
   incomingAssetProgram: PublicKey | Pda;
   /** The SPL associated token program account program */
-  associatedTokenProgram: PublicKey | Pda;
+  associatedTokenProgram?: PublicKey | Pda;
   /** System program account */
   systemProgram?: PublicKey | Pda;
 };
@@ -109,38 +111,43 @@ export function swap(
       isWritable: true as boolean,
       value: input.incomingAsset ?? null,
     },
-    swapMarkerAux: {
+    swapMarkerAuxIncoming: {
       index: 5,
       isWritable: true as boolean,
-      value: input.swapMarkerAux ?? null,
+      value: input.swapMarkerAuxIncoming ?? null,
+    },
+    swapMarkerAuxOutgoing: {
+      index: 6,
+      isWritable: true as boolean,
+      value: input.swapMarkerAuxOutgoing ?? null,
     },
     escrowedAssetAux: {
-      index: 6,
+      index: 7,
       isWritable: true as boolean,
       value: input.escrowedAssetAux ?? null,
     },
     incomingAssetAux: {
-      index: 7,
+      index: 8,
       isWritable: true as boolean,
       value: input.incomingAssetAux ?? null,
     },
     escrowedAssetProgram: {
-      index: 8,
+      index: 9,
       isWritable: false as boolean,
       value: input.escrowedAssetProgram ?? null,
     },
     incomingAssetProgram: {
-      index: 9,
+      index: 10,
       isWritable: false as boolean,
       value: input.incomingAssetProgram ?? null,
     },
     associatedTokenProgram: {
-      index: 10,
+      index: 11,
       isWritable: false as boolean,
       value: input.associatedTokenProgram ?? null,
     },
     systemProgram: {
-      index: 11,
+      index: 12,
       isWritable: false as boolean,
       value: input.systemProgram ?? null,
     },

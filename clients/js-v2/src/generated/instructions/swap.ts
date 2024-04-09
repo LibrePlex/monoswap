@@ -39,7 +39,8 @@ export type SwapInstruction<
   TAccountSwapMarker extends string | IAccountMeta<string> = string,
   TAccountEscrowedAsset extends string | IAccountMeta<string> = string,
   TAccountIncomingAsset extends string | IAccountMeta<string> = string,
-  TAccountSwapMarkerAux extends string | IAccountMeta<string> = string,
+  TAccountSwapMarkerAuxIncoming extends string | IAccountMeta<string> = string,
+  TAccountSwapMarkerAuxOutgoing extends string | IAccountMeta<string> = string,
   TAccountEscrowedAssetAux extends string | IAccountMeta<string> = string,
   TAccountIncomingAssetAux extends string | IAccountMeta<string> = string,
   TAccountEscrowedAssetProgram extends string | IAccountMeta<string> = string,
@@ -70,9 +71,12 @@ export type SwapInstruction<
       TAccountIncomingAsset extends string
         ? WritableAccount<TAccountIncomingAsset>
         : TAccountIncomingAsset,
-      TAccountSwapMarkerAux extends string
-        ? WritableAccount<TAccountSwapMarkerAux>
-        : TAccountSwapMarkerAux,
+      TAccountSwapMarkerAuxIncoming extends string
+        ? WritableAccount<TAccountSwapMarkerAuxIncoming>
+        : TAccountSwapMarkerAuxIncoming,
+      TAccountSwapMarkerAuxOutgoing extends string
+        ? WritableAccount<TAccountSwapMarkerAuxOutgoing>
+        : TAccountSwapMarkerAuxOutgoing,
       TAccountEscrowedAssetAux extends string
         ? WritableAccount<TAccountEscrowedAssetAux>
         : TAccountEscrowedAssetAux,
@@ -126,7 +130,8 @@ export type SwapInput<
   TAccountSwapMarker extends string = string,
   TAccountEscrowedAsset extends string = string,
   TAccountIncomingAsset extends string = string,
-  TAccountSwapMarkerAux extends string = string,
+  TAccountSwapMarkerAuxIncoming extends string = string,
+  TAccountSwapMarkerAuxOutgoing extends string = string,
   TAccountEscrowedAssetAux extends string = string,
   TAccountIncomingAssetAux extends string = string,
   TAccountEscrowedAssetProgram extends string = string,
@@ -145,7 +150,9 @@ export type SwapInput<
   /** External asset connected to the incoming asset */
   incomingAsset: Address<TAccountIncomingAsset>;
   /** Auxiliary account for the swap marker: e.g. ATA */
-  swapMarkerAux: Address<TAccountSwapMarkerAux>;
+  swapMarkerAuxIncoming?: Address<TAccountSwapMarkerAuxIncoming>;
+  /** Auxiliary account for the swap marker: e.g. ATA */
+  swapMarkerAuxOutgoing?: Address<TAccountSwapMarkerAuxOutgoing>;
   /** Associated account for the incoming asset, e.g. token account */
   escrowedAssetAux?: Address<TAccountEscrowedAssetAux>;
   /** Associated account for the external asset, e.g. token account */
@@ -155,7 +162,7 @@ export type SwapInput<
   /** Transfer Program ID of the external asset */
   incomingAssetProgram: Address<TAccountIncomingAssetProgram>;
   /** The SPL associated token program account program */
-  associatedTokenProgram: Address<TAccountAssociatedTokenProgram>;
+  associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
   /** System program account */
   systemProgram?: Address<TAccountSystemProgram>;
 };
@@ -166,7 +173,8 @@ export function getSwapInstruction<
   TAccountSwapMarker extends string,
   TAccountEscrowedAsset extends string,
   TAccountIncomingAsset extends string,
-  TAccountSwapMarkerAux extends string,
+  TAccountSwapMarkerAuxIncoming extends string,
+  TAccountSwapMarkerAuxOutgoing extends string,
   TAccountEscrowedAssetAux extends string,
   TAccountIncomingAssetAux extends string,
   TAccountEscrowedAssetProgram extends string,
@@ -180,7 +188,8 @@ export function getSwapInstruction<
     TAccountSwapMarker,
     TAccountEscrowedAsset,
     TAccountIncomingAsset,
-    TAccountSwapMarkerAux,
+    TAccountSwapMarkerAuxIncoming,
+    TAccountSwapMarkerAuxOutgoing,
     TAccountEscrowedAssetAux,
     TAccountIncomingAssetAux,
     TAccountEscrowedAssetProgram,
@@ -195,7 +204,8 @@ export function getSwapInstruction<
   TAccountSwapMarker,
   TAccountEscrowedAsset,
   TAccountIncomingAsset,
-  TAccountSwapMarkerAux,
+  TAccountSwapMarkerAuxIncoming,
+  TAccountSwapMarkerAuxOutgoing,
   TAccountEscrowedAssetAux,
   TAccountIncomingAssetAux,
   TAccountEscrowedAssetProgram,
@@ -213,7 +223,14 @@ export function getSwapInstruction<
     swapMarker: { value: input.swapMarker ?? null, isWritable: true },
     escrowedAsset: { value: input.escrowedAsset ?? null, isWritable: true },
     incomingAsset: { value: input.incomingAsset ?? null, isWritable: true },
-    swapMarkerAux: { value: input.swapMarkerAux ?? null, isWritable: true },
+    swapMarkerAuxIncoming: {
+      value: input.swapMarkerAuxIncoming ?? null,
+      isWritable: true,
+    },
+    swapMarkerAuxOutgoing: {
+      value: input.swapMarkerAuxOutgoing ?? null,
+      isWritable: true,
+    },
     escrowedAssetAux: {
       value: input.escrowedAssetAux ?? null,
       isWritable: true,
@@ -255,7 +272,8 @@ export function getSwapInstruction<
       getAccountMeta(accounts.swapMarker),
       getAccountMeta(accounts.escrowedAsset),
       getAccountMeta(accounts.incomingAsset),
-      getAccountMeta(accounts.swapMarkerAux),
+      getAccountMeta(accounts.swapMarkerAuxIncoming),
+      getAccountMeta(accounts.swapMarkerAuxOutgoing),
       getAccountMeta(accounts.escrowedAssetAux),
       getAccountMeta(accounts.incomingAssetAux),
       getAccountMeta(accounts.escrowedAssetProgram),
@@ -272,7 +290,8 @@ export function getSwapInstruction<
     TAccountSwapMarker,
     TAccountEscrowedAsset,
     TAccountIncomingAsset,
-    TAccountSwapMarkerAux,
+    TAccountSwapMarkerAuxIncoming,
+    TAccountSwapMarkerAuxOutgoing,
     TAccountEscrowedAssetAux,
     TAccountIncomingAssetAux,
     TAccountEscrowedAssetProgram,
@@ -301,19 +320,21 @@ export type ParsedSwapInstruction<
     /** External asset connected to the incoming asset */
     incomingAsset: TAccountMetas[4];
     /** Auxiliary account for the swap marker: e.g. ATA */
-    swapMarkerAux: TAccountMetas[5];
+    swapMarkerAuxIncoming?: TAccountMetas[5] | undefined;
+    /** Auxiliary account for the swap marker: e.g. ATA */
+    swapMarkerAuxOutgoing?: TAccountMetas[6] | undefined;
     /** Associated account for the incoming asset, e.g. token account */
-    escrowedAssetAux?: TAccountMetas[6] | undefined;
+    escrowedAssetAux?: TAccountMetas[7] | undefined;
     /** Associated account for the external asset, e.g. token account */
-    incomingAssetAux?: TAccountMetas[7] | undefined;
+    incomingAssetAux?: TAccountMetas[8] | undefined;
     /** Transfer Program ID of the incoming asset */
-    escrowedAssetProgram: TAccountMetas[8];
+    escrowedAssetProgram: TAccountMetas[9];
     /** Transfer Program ID of the external asset */
-    incomingAssetProgram: TAccountMetas[9];
+    incomingAssetProgram: TAccountMetas[10];
     /** The SPL associated token program account program */
-    associatedTokenProgram: TAccountMetas[10];
+    associatedTokenProgram?: TAccountMetas[11] | undefined;
     /** System program account */
-    systemProgram: TAccountMetas[11];
+    systemProgram: TAccountMetas[12];
   };
   data: SwapInstructionData;
 };
@@ -326,7 +347,7 @@ export function parseSwapInstruction<
     IInstructionWithAccounts<TAccountMetas> &
     IInstructionWithData<Uint8Array>
 ): ParsedSwapInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 12) {
+  if (instruction.accounts.length < 13) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
   }
@@ -350,12 +371,13 @@ export function parseSwapInstruction<
       swapMarker: getNextAccount(),
       escrowedAsset: getNextAccount(),
       incomingAsset: getNextAccount(),
-      swapMarkerAux: getNextAccount(),
+      swapMarkerAuxIncoming: getNextOptionalAccount(),
+      swapMarkerAuxOutgoing: getNextOptionalAccount(),
       escrowedAssetAux: getNextOptionalAccount(),
       incomingAssetAux: getNextOptionalAccount(),
       escrowedAssetProgram: getNextAccount(),
       incomingAssetProgram: getNextAccount(),
-      associatedTokenProgram: getNextAccount(),
+      associatedTokenProgram: getNextOptionalAccount(),
       systemProgram: getNextAccount(),
     },
     data: getSwapInstructionDataDecoder().decode(instruction.data),

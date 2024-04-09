@@ -42,6 +42,20 @@ jobs:
           cache: ${{ env.CACHE }}
           key: client-js-v1
 
+      - name: Install Node root dependencies
+        uses: nifty-oss/actions/install-node-dependencies@v1
+        with:
+          folder: "."
+          cache: ${{ env.CACHE }}
+          key: client-js-v1
+
+      - name: Install Node dependencies
+        uses: nifty-oss/actions/install-node-dependencies@v1
+        with:
+          folder: ./clients/js-v1
+          cache: ${{ env.CACHE }}
+          key: client-js-v1
+
       - name: Install zx
         run: npm install -g zx
 
@@ -66,7 +80,7 @@ jobs:
 
       - name: Run tests
         shell: bash
-        working-directory: scripts/program
-        run: RUST_LOG=error npx zx test.mjs
+        working-directory: "."
+        run: RUST_LOG=error npx zx ./scripts/program/test.mjs
         env:
           PROGRAM: ${{ matrix.program }}

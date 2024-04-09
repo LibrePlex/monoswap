@@ -73,7 +73,10 @@ pub fn process_swap<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
                     Some(account_info) => account_info,
                     None => return Err(MonoswapError::MissingIncomingAssetAux.into()),
                 },
-                destination_ata_info: ctx.accounts.swap_marker_aux,
+                destination_ata_info: match ctx.accounts.swap_marker_aux_incoming {
+                    Some(account_info) => account_info,
+                    None => return Err(MonoswapError::MissingSwapMarkerAux.into()),
+                },
                 amount: swap_marker.external_amount,
                 signer_seeds: &[],
             };
@@ -113,7 +116,10 @@ pub fn process_swap<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
                 mint_info: ctx.accounts.escrowed_asset,
                 source_owner_info: ctx.accounts.swap_marker,
                 destination_owner_info: ctx.accounts.authority,
-                source_ata_info: ctx.accounts.swap_marker_aux,
+                source_ata_info: match ctx.accounts.swap_marker_aux_outgoing {
+                    Some(account_info) => account_info,
+                    None => return Err(MonoswapError::MissingSwapMarkerAux.into()),
+                },
                 destination_ata_info: match ctx.accounts.escrowed_asset_aux {
                     Some(account_info) => account_info,
                     None => return Err(MonoswapError::MissingEscrowedAssetAux.into()),
