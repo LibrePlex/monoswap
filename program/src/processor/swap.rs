@@ -1,5 +1,7 @@
 use super::*;
 
+/// The `process_swap` function is responsible for swapping the incoming asset with the escrowed
+/// asset on the swap marker account.
 pub fn process_swap<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
     msg!("Processing swap");
     let ctx = SwapAccounts::context(accounts)?;
