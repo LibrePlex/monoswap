@@ -30,8 +30,10 @@ pub fn process_create_swap<'a>(
 
     let namespace_pub = *ctx.accounts.namespace.key;
     let asset1_pub = *ctx.accounts.incoming_asset.key;
-    let asset1_bytes = asset1_pub.to_bytes();
     let asset2_pub = *ctx.accounts.external_asset.key;
+
+    // Used to build the signer seeds.
+    let asset1_bytes = asset1_pub.to_bytes();
     let asset2_bytes = asset2_pub.to_bytes();
 
     // Check the swap marker account is derived from the correct seeds and owned by this program.

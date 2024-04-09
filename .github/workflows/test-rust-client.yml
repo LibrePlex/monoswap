@@ -1,4 +1,4 @@
-name: Test Programs
+name: Test Rust Client
 
 on:
   workflow_call:
@@ -11,12 +11,9 @@ env:
   CARGO_NET_GIT_FETCH_WITH_CLI: "true"
 
 jobs:
-  test_programs:
+  test_sdk:
     name: Test
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        program: ${{ fromJson(inputs.program_matrix) }}
     steps:
       - name: Git checkout
         uses: actions/checkout@v4
@@ -45,28 +42,18 @@ jobs:
       - name: Install zx
         run: npm install -g zx
 
-      - name: Cache program dependencies
-        if: env.CACHE == 'true'
-        uses: nifty-oss/actions/cache-crate@v1
+      - name: Cache Rust client test dependencies
+        uses: ./.github/actions/cache-crate
         with:
-          folder: '.'
-          key: programs
+          folder: ./clients/rust
+          key: rust-client-test
 
-      - name: Run cargo fmt
-        uses: nifty-oss/actions/cargo@v1
+      - name: Download program builds
+        uses: actions/download-artifact@v4
         with:
-          command: fmt
-          args: --all --manifest-path ./${{ matrix.program }}/Cargo.toml -- --check
-
-      - name: Run cargo clippy
-        uses: nifty-oss/actions/cargo@v1
-        with:
-          command: clippy
-          args: --all-targets --all-features --no-deps --manifest-path ./${{ matrix.program }}/Cargo.toml
+          name: program-builds
 
       - name: Run tests
         shell: bash
-        working-directory: scripts/program
-        run: RUST_LOG=error npx zx test.mjs
-        env:
-          PROGRAM: ${{ matrix.program }}
+        working-directory: scripts/client
+        run: RUST_LOG=error npx zx test-rust.mjs
