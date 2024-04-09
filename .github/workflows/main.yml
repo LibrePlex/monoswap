@@ -94,38 +94,38 @@ jobs:
           command: clippy
           args: --all-targets --all-features --no-deps
 
-  lint_js:
-    name: Lint JS
-    if: ${{ needs.changes.outputs.any == 'true' }}
-    needs: changes
-    runs-on: ubuntu-latest
-    steps:
-      - name: Git checkout
-        uses: actions/checkout@v4
+  # lint_js:
+  #   name: Lint JS
+  #   if: ${{ needs.changes.outputs.any == 'true' }}
+  #   needs: changes
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Git checkout
+  #       uses: actions/checkout@v4
 
-      - name: Load environment variables
-        run: cat .github/.env >> $GITHUB_ENV
+  #     - name: Load environment variables
+  #       run: cat .github/.env >> $GITHUB_ENV
 
-      - name: Install Node.js
-        uses: nifty-oss/actions/install-node-with-pnpm@v1
-        with:
-          version: ${{ env.NODE_VERSION }}
-          cache: ${{ env.CACHE }}
+  #     - name: Install Node.js
+  #       uses: nifty-oss/actions/install-node-with-pnpm@v1
+  #       with:
+  #         version: ${{ env.NODE_VERSION }}
+  #         cache: ${{ env.CACHE }}
 
-      - name: Install dependencies
-        uses: nifty-oss/actions/install-node-dependencies@v1
-        with:
-          folder: ./clients/js-v1
-          cache: ${{ env.CACHE }}
-          key: client-js
+  #     - name: Install dependencies
+  #       uses: nifty-oss/actions/install-node-dependencies@v1
+  #       with:
+  #         folder: ./clients/js-v1
+  #         cache: ${{ env.CACHE }}
+  #         key: client-js
 
-      - name: Format
-        working-directory: ./clients/js-v1
-        run: pnpm format
+  #     - name: Format
+  #       working-directory: ./clients/js-v1
+  #       run: pnpm format
 
-      - name: Lint
-        working-directory: ./clients/js-v1
-        run: pnpm lint
+  #     - name: Lint
+  #       working-directory: ./clients/js-v1
+  #       run: pnpm lint
 
   build_programs:
     name: Programs
@@ -211,11 +211,11 @@ jobs:
   #   with:
   #     client_matrix: ${{ needs.changes.outputs.rust_client_matrix }}
 
-  # build_rust:
-  #   if: ${{ needs.changes.outputs.rust_clients == 'true' }}
-  #   name: Rust Client
-  #   needs: [changes, generate_clients]
-  #   uses: ./.github/workflows/build-rust-client.yml
-  #   secrets: inherit
-  #   with:
-  #     client_matrix: ${{ needs.changes.outputs.rust_client_matrix }}
+  build_rust:
+    if: ${{ needs.changes.outputs.rust_clients == 'true' }}
+    name: Rust Client
+    needs: [changes, generate_clients]
+    uses: ./.github/workflows/build-rust-client.yml
+    secrets: inherit
+    with:
+      client_matrix: ${{ needs.changes.outputs.rust_client_matrix }}

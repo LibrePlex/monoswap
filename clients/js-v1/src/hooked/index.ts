@@ -28,7 +28,7 @@ export function findSwapMarkerPda(
 
   let pda;
 
-  for (let i = 0; i < a1Bytes.length; i++) {
+  for (let i = 0; i < a1Bytes.length; i += 1) {
     if (a1Bytes[i] < a2Bytes[i]) {
       pda = context.eddsa.findPda(programId, [
         string({ size: 'variable' }).serialize('swap_marker'),
