@@ -49,7 +49,7 @@ pub fn detect_asset(asset_info: &AccountInfo) -> Result<AssetType, ProgramError>
             // Not a Metaplex legacy asset, so some type of SPL token.
             AssetType::SplToken
         }
-        // Unknown program.
+        // Unknown program, so unsupported asset type.
         _ => {
             msg!("Unknown program");
             AssetType::Invalid
