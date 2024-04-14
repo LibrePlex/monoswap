@@ -10,9 +10,9 @@ import { Serializer, scalarEnum } from '@metaplex-foundation/umi/serializers';
 
 export enum AssetType {
   Invalid,
-  Nifty,
+  NiftyAsset,
   SplToken,
-  MplxLegacy,
+  MplxpNFT,
   MplxCore,
 }
 

@@ -17,9 +17,9 @@ import {
 
 export enum AssetType {
   Invalid,
-  Nifty,
+  NiftyAsset,
   SplToken,
-  MplxLegacy,
+  MplxpNFT,
   MplxCore,
 }
 
