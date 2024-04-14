@@ -12,8 +12,8 @@ dependencies:
     specifier: ^0.9.1
     version: 0.9.1(@metaplex-foundation/umi@0.9.1)(@solana/web3.js@1.91.4)
   '@nifty-oss/asset':
-    specifier: ^0.2.0
-    version: 0.2.0(@metaplex-foundation/umi@0.9.1)
+    specifier: ^0.3.0
+    version: 0.3.0(@metaplex-foundation/umi@0.9.1)
   '@solana/spl-token':
     specifier: ^0.4.3
     version: 0.4.3(@solana/web3.js@1.91.4)(fastestsmallesttextencoderdecoder@1.0.22)
@@ -336,8 +336,8 @@ packages:
       '@metaplex-foundation/umi-public-keys': 0.8.9
       '@metaplex-foundation/umi-serializers': 0.9.0
 
-  /@nifty-oss/asset@0.2.0(@metaplex-foundation/umi@0.9.1):
-    resolution: {integrity: sha512-TSr5hSZNVSLKweDCOUdyPHpjKiZQwUpxIjOxWADTt85S2bzZl3CZPXvT3kpVJ0QjjtUkDUBZwN52rRiL78x25Q==}
+  /@nifty-oss/asset@0.3.0(@metaplex-foundation/umi@0.9.1):
+    resolution: {integrity: sha512-2pAzMLYxCF2s/2NdKSxL/KwMhw/X6U2l2fHYpVkJbeym9h7kKe53mStiwXvX/hmFKGuWpfCySk8Qz6JUtUEUhA==}
     peerDependencies:
       '@metaplex-foundation/umi': ^0.9.1
     dependencies:

@@ -65,7 +65,7 @@
     "dependencies": {
         "@metaplex-foundation/mpl-toolbox": "^0.9.4",
         "@metaplex-foundation/umi-bundle-defaults": "^0.9.1",
-        "@nifty-oss/asset": "^0.2.0",
+        "@nifty-oss/asset": "^0.3.0",
         "@solana/spl-token": "^0.4.3"
     }
 }

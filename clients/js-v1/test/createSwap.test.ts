@@ -45,6 +45,7 @@ test('it can create a nifty-to-fungible asset swap', async (t) => {
   // Create a Nifty  asset owned by the user.
   await create(umi, {
     asset,
+    authority: umi.identity.publicKey,
     owner: user.publicKey,
     payer: umi.identity,
     name: 'Digital Asset',
@@ -141,6 +142,7 @@ test('it can create a fungible-to-nifty asset swap', async (t) => {
   // Create a Nifty asset.
   await create(umi, {
     asset,
+    authority: umi.identity.publicKey,
     owner: authority.publicKey,
     payer: umi.identity,
     name: 'Digital Asset',
@@ -233,6 +235,7 @@ test('it can create a nifty-to-nifty asset swap', async (t) => {
   // Create a Nifty  asset owned by the user.
   await create(umi, {
     asset,
+    authority: user.publicKey,
     owner: user.publicKey,
     payer: umi.identity,
     name: 'Digital Asset',
