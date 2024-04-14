@@ -23,9 +23,9 @@ pub struct SwapNiftySPL {
     /// Group account for the nifty asset, if applicable
     pub nifty_asset_group: Option<solana_program::pubkey::Pubkey>,
     /// ATA account for the swap marker, if applicable
-    pub swap_marker_ata: Option<solana_program::pubkey::Pubkey>,
+    pub swap_marker_ata: solana_program::pubkey::Pubkey,
     /// ATA account for the authority, if applicable
-    pub authority_ata: Option<solana_program::pubkey::Pubkey>,
+    pub authority_ata: solana_program::pubkey::Pubkey,
     /// Transfer Program ID of the incoming asset
     pub escrowed_asset_program: solana_program::pubkey::Pubkey,
     /// Transfer Program ID of the external asset
@@ -76,28 +76,14 @@ impl SwapNiftySPL {
                 false,
             ));
         }
-        if let Some(swap_marker_ata) = self.swap_marker_ata {
-            accounts.push(solana_program::instruction::AccountMeta::new(
-                swap_marker_ata,
-                false,
-            ));
-        } else {
-            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                crate::MONOSWAP_ID,
-                false,
-            ));
-        }
-        if let Some(authority_ata) = self.authority_ata {
-            accounts.push(solana_program::instruction::AccountMeta::new(
-                authority_ata,
-                false,
-            ));
-        } else {
-            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                crate::MONOSWAP_ID,
-                false,
-            ));
-        }
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            self.swap_marker_ata,
+            false,
+        ));
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            self.authority_ata,
+            false,
+        ));
         accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             self.escrowed_asset_program,
             false,
@@ -153,8 +139,8 @@ impl SwapNiftySPLInstructionData {
 ///   3. `[writable]` escrowed_asset
 ///   4. `[writable]` incoming_asset
 ///   5. `[writable, optional]` nifty_asset_group
-///   6. `[writable, optional]` swap_marker_ata
-///   7. `[writable, optional]` authority_ata
+///   6. `[writable]` swap_marker_ata
+///   7. `[writable]` authority_ata
 ///   8. `[]` escrowed_asset_program
 ///   9. `[]` incoming_asset_program
 ///   10. `[optional]` associated_token_program
@@ -220,24 +206,19 @@ impl SwapNiftySPLBuilder {
         self.nifty_asset_group = nifty_asset_group;
         self
     }
-    /// `[optional account]`
     /// ATA account for the swap marker, if applicable
     #[inline(always)]
     pub fn swap_marker_ata(
         &mut self,
-        swap_marker_ata: Option<solana_program::pubkey::Pubkey>,
+        swap_marker_ata: solana_program::pubkey::Pubkey,
     ) -> &mut Self {
-        self.swap_marker_ata = swap_marker_ata;
+        self.swap_marker_ata = Some(swap_marker_ata);
         self
     }
-    /// `[optional account]`
     /// ATA account for the authority, if applicable
     #[inline(always)]
-    pub fn authority_ata(
-        &mut self,
-        authority_ata: Option<solana_program::pubkey::Pubkey>,
-    ) -> &mut Self {
-        self.authority_ata = authority_ata;
+    pub fn authority_ata(&mut self, authority_ata: solana_program::pubkey::Pubkey) -> &mut Self {
+        self.authority_ata = Some(authority_ata);
         self
     }
     /// Transfer Program ID of the incoming asset
@@ -302,8 +283,8 @@ impl SwapNiftySPLBuilder {
             escrowed_asset: self.escrowed_asset.expect("escrowed_asset is not set"),
             incoming_asset: self.incoming_asset.expect("incoming_asset is not set"),
             nifty_asset_group: self.nifty_asset_group,
-            swap_marker_ata: self.swap_marker_ata,
-            authority_ata: self.authority_ata,
+            swap_marker_ata: self.swap_marker_ata.expect("swap_marker_ata is not set"),
+            authority_ata: self.authority_ata.expect("authority_ata is not set"),
             escrowed_asset_program: self
                 .escrowed_asset_program
                 .expect("escrowed_asset_program is not set"),
@@ -335,9 +316,9 @@ pub struct SwapNiftySPLCpiAccounts<'a, 'b> {
     /// Group account for the nifty asset, if applicable
     pub nifty_asset_group: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// ATA account for the swap marker, if applicable
-    pub swap_marker_ata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    pub swap_marker_ata: &'b solana_program::account_info::AccountInfo<'a>,
     /// ATA account for the authority, if applicable
-    pub authority_ata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    pub authority_ata: &'b solana_program::account_info::AccountInfo<'a>,
     /// Transfer Program ID of the incoming asset
     pub escrowed_asset_program: &'b solana_program::account_info::AccountInfo<'a>,
     /// Transfer Program ID of the external asset
@@ -365,9 +346,9 @@ pub struct SwapNiftySPLCpi<'a, 'b> {
     /// Group account for the nifty asset, if applicable
     pub nifty_asset_group: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// ATA account for the swap marker, if applicable
-    pub swap_marker_ata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    pub swap_marker_ata: &'b solana_program::account_info::AccountInfo<'a>,
     /// ATA account for the authority, if applicable
-    pub authority_ata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    pub authority_ata: &'b solana_program::account_info::AccountInfo<'a>,
     /// Transfer Program ID of the incoming asset
     pub escrowed_asset_program: &'b solana_program::account_info::AccountInfo<'a>,
     /// Transfer Program ID of the external asset
@@ -464,28 +445,14 @@ impl<'a, 'b> SwapNiftySPLCpi<'a, 'b> {
                 false,
             ));
         }
-        if let Some(swap_marker_ata) = self.swap_marker_ata {
-            accounts.push(solana_program::instruction::AccountMeta::new(
-                *swap_marker_ata.key,
-                false,
-            ));
-        } else {
-            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                crate::MONOSWAP_ID,
-                false,
-            ));
-        }
-        if let Some(authority_ata) = self.authority_ata {
-            accounts.push(solana_program::instruction::AccountMeta::new(
-                *authority_ata.key,
-                false,
-            ));
-        } else {
-            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                crate::MONOSWAP_ID,
-                false,
-            ));
-        }
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            *self.swap_marker_ata.key,
+            false,
+        ));
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            *self.authority_ata.key,
+            false,
+        ));
         accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             *self.escrowed_asset_program.key,
             false,
@@ -533,12 +500,8 @@ impl<'a, 'b> SwapNiftySPLCpi<'a, 'b> {
         if let Some(nifty_asset_group) = self.nifty_asset_group {
             account_infos.push(nifty_asset_group.clone());
         }
-        if let Some(swap_marker_ata) = self.swap_marker_ata {
-            account_infos.push(swap_marker_ata.clone());
-        }
-        if let Some(authority_ata) = self.authority_ata {
-            account_infos.push(authority_ata.clone());
-        }
+        account_infos.push(self.swap_marker_ata.clone());
+        account_infos.push(self.authority_ata.clone());
         account_infos.push(self.escrowed_asset_program.clone());
         account_infos.push(self.incoming_asset_program.clone());
         if let Some(associated_token_program) = self.associated_token_program {
@@ -567,8 +530,8 @@ impl<'a, 'b> SwapNiftySPLCpi<'a, 'b> {
 ///   3. `[writable]` escrowed_asset
 ///   4. `[writable]` incoming_asset
 ///   5. `[writable, optional]` nifty_asset_group
-///   6. `[writable, optional]` swap_marker_ata
-///   7. `[writable, optional]` authority_ata
+///   6. `[writable]` swap_marker_ata
+///   7. `[writable]` authority_ata
 ///   8. `[]` escrowed_asset_program
 ///   9. `[]` incoming_asset_program
 ///   10. `[optional]` associated_token_program
@@ -649,24 +612,22 @@ impl<'a, 'b> SwapNiftySPLCpiBuilder<'a, 'b> {
         self.instruction.nifty_asset_group = nifty_asset_group;
         self
     }
-    /// `[optional account]`
     /// ATA account for the swap marker, if applicable
     #[inline(always)]
     pub fn swap_marker_ata(
         &mut self,
-        swap_marker_ata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+        swap_marker_ata: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
-        self.instruction.swap_marker_ata = swap_marker_ata;
+        self.instruction.swap_marker_ata = Some(swap_marker_ata);
         self
     }
-    /// `[optional account]`
     /// ATA account for the authority, if applicable
     #[inline(always)]
     pub fn authority_ata(
         &mut self,
-        authority_ata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+        authority_ata: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
-        self.instruction.authority_ata = authority_ata;
+        self.instruction.authority_ata = Some(authority_ata);
         self
     }
     /// Transfer Program ID of the incoming asset
@@ -771,9 +732,15 @@ impl<'a, 'b> SwapNiftySPLCpiBuilder<'a, 'b> {
 
             nifty_asset_group: self.instruction.nifty_asset_group,
 
-            swap_marker_ata: self.instruction.swap_marker_ata,
+            swap_marker_ata: self
+                .instruction
+                .swap_marker_ata
+                .expect("swap_marker_ata is not set"),
 
-            authority_ata: self.instruction.authority_ata,
+            authority_ata: self
+                .instruction
+                .authority_ata
+                .expect("authority_ata is not set"),
 
             escrowed_asset_program: self
                 .instruction

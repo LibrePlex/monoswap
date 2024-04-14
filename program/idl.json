@@ -358,7 +358,6 @@
           "name": "swapMarkerAta",
           "isMut": true,
           "isSigner": false,
-          "isOptional": true,
           "docs": [
             "ATA account for the swap marker, if applicable"
           ]
@@ -367,7 +366,6 @@
           "name": "authorityAta",
           "isMut": true,
           "isSigner": false,
-          "isOptional": true,
           "docs": [
             "ATA account for the authority, if applicable"
           ]

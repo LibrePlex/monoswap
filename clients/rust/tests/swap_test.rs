@@ -133,11 +133,11 @@ async fn create() {
         .payer(context.payer.pubkey())
         .authority(user) // User has the authority to transfer the incoming nifty asset
         .swap_marker(swap_marker)
-        .swap_marker_ata(Some(swap_marker_ata)) // ATA where fungibles are escrowed
+        .swap_marker_ata(swap_marker_ata) // ATA where fungibles are escrowed
         .incoming_asset(asset) // Nifty asset incoming
         .nifty_asset_group(None) // No Nifty group
         .escrowed_asset(mint) // Escrowed fungibles mint
-        .authority_ata(Some(user_ata)) // Escrowed mint ata owned by the user
+        .authority_ata(user_ata) // Escrowed mint ata owned by the user
         .incoming_asset_program(nifty_asset::ID) // Nifty program needed to transfer the asset
         .escrowed_asset_program(spl_token::ID) // SPL token program needed to transfer the fungibles
         .associated_token_program(Some(spl_associated_token_account::ID))

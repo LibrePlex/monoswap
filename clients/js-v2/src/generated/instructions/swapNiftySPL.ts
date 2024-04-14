@@ -147,9 +147,9 @@ export type SwapNiftySPLInput<
   /** Group account for the nifty asset, if applicable */
   niftyAssetGroup?: Address<TAccountNiftyAssetGroup>;
   /** ATA account for the swap marker, if applicable */
-  swapMarkerAta?: Address<TAccountSwapMarkerAta>;
+  swapMarkerAta: Address<TAccountSwapMarkerAta>;
   /** ATA account for the authority, if applicable */
-  authorityAta?: Address<TAccountAuthorityAta>;
+  authorityAta: Address<TAccountAuthorityAta>;
   /** Transfer Program ID of the incoming asset */
   escrowedAssetProgram: Address<TAccountEscrowedAssetProgram>;
   /** Transfer Program ID of the external asset */
@@ -297,9 +297,9 @@ export type ParsedSwapNiftySPLInstruction<
     /** Group account for the nifty asset, if applicable */
     niftyAssetGroup?: TAccountMetas[5] | undefined;
     /** ATA account for the swap marker, if applicable */
-    swapMarkerAta?: TAccountMetas[6] | undefined;
+    swapMarkerAta: TAccountMetas[6];
     /** ATA account for the authority, if applicable */
-    authorityAta?: TAccountMetas[7] | undefined;
+    authorityAta: TAccountMetas[7];
     /** Transfer Program ID of the incoming asset */
     escrowedAssetProgram: TAccountMetas[8];
     /** Transfer Program ID of the external asset */
@@ -345,8 +345,8 @@ export function parseSwapNiftySPLInstruction<
       escrowedAsset: getNextAccount(),
       incomingAsset: getNextAccount(),
       niftyAssetGroup: getNextOptionalAccount(),
-      swapMarkerAta: getNextOptionalAccount(),
-      authorityAta: getNextOptionalAccount(),
+      swapMarkerAta: getNextAccount(),
+      authorityAta: getNextAccount(),
       escrowedAssetProgram: getNextAccount(),
       incomingAssetProgram: getNextAccount(),
       associatedTokenProgram: getNextOptionalAccount(),

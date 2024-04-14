@@ -63,14 +63,8 @@ pub fn process_swap_nifty_spl<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramRes
                 mint_info: ctx.accounts.escrowed_asset,
                 source_owner_info: ctx.accounts.swap_marker,
                 destination_owner_info: ctx.accounts.authority,
-                source_ata_info: match ctx.accounts.swap_marker_ata {
-                    Some(account_info) => account_info,
-                    None => return Err(MonoswapError::MissingSwapMarkerAta.into()),
-                },
-                destination_ata_info: match ctx.accounts.authority_ata {
-                    Some(account_info) => account_info,
-                    None => return Err(MonoswapError::MissingAuthorityAta.into()),
-                },
+                source_ata_info: ctx.accounts.swap_marker_ata,
+                destination_ata_info: ctx.accounts.authority_ata,
                 amount: swap_marker.escrowed_amount,
                 signer_seeds,
             };
@@ -88,14 +82,8 @@ pub fn process_swap_nifty_spl<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramRes
                 mint_info: ctx.accounts.incoming_asset,
                 source_owner_info: ctx.accounts.authority,
                 destination_owner_info: ctx.accounts.swap_marker,
-                source_ata_info: match ctx.accounts.authority_ata {
-                    Some(account_info) => account_info,
-                    None => return Err(MonoswapError::MissingAuthorityAta.into()),
-                },
-                destination_ata_info: match ctx.accounts.swap_marker_ata {
-                    Some(account_info) => account_info,
-                    None => return Err(MonoswapError::MissingSwapMarkerAta.into()),
-                },
+                source_ata_info: ctx.accounts.authority_ata,
+                destination_ata_info: ctx.accounts.swap_marker_ata,
                 amount: swap_marker.external_amount,
                 signer_seeds: &[],
             };

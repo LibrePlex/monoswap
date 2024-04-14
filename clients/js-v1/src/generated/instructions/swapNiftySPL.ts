@@ -41,9 +41,9 @@ export type SwapNiftySPLInstructionAccounts = {
   /** Group account for the nifty asset, if applicable */
   niftyAssetGroup?: PublicKey | Pda;
   /** ATA account for the swap marker, if applicable */
-  swapMarkerAta?: PublicKey | Pda;
+  swapMarkerAta: PublicKey | Pda;
   /** ATA account for the authority, if applicable */
-  authorityAta?: PublicKey | Pda;
+  authorityAta: PublicKey | Pda;
   /** Transfer Program ID of the incoming asset */
   escrowedAssetProgram: PublicKey | Pda;
   /** Transfer Program ID of the external asset */
