@@ -28,9 +28,9 @@ export function getExternalProgramAddresses() {
 
 let didWarnAboutMissingPrograms = false;
 export function getProgramFolders() {
-  const programs = process.env.PROGRAMS
-    ? process.env.PROGRAMS.split(/\s+/)
-    : getAllProgramFolders();
+  const programs = getAllProgramFolders()
+    ? getAllProgramFolders()
+    : process.env.PROGRAMS.split(/\s+/);
   const filteredPrograms = programs.filter((program) =>
     fs.existsSync(path.join(workingDirectory, program))
   );
