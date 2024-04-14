@@ -50,7 +50,7 @@ async fn create_swap() {
     })
     .0;
 
-    let swap_marker_aux =
+    let swap_marker_ata =
         get_associated_token_address_with_program_id(&swap_marker, &mint, &spl_token::ID);
 
     println!("Swap marker: {:?}", swap_marker);
@@ -69,9 +69,9 @@ async fn create_swap() {
         .namespace(authority)
         .authority(authority)
         .swap_marker(swap_marker)
-        .swap_marker_aux(Some(swap_marker_aux))
+        .swap_marker_ata(Some(swap_marker_ata))
         .incoming_asset(mint)
-        .incoming_asset_aux(Some(ata))
+        .authority_ata(Some(ata))
         .external_asset(asset)
         .incoming_asset_program(spl_token::ID)
         .associated_token_program(Some(spl_associated_token_account::ID))
@@ -105,7 +105,7 @@ async fn create_swap() {
     // Fungibles are escrowed by the swap marker.
     let ata_account = context
         .banks_client
-        .get_account(swap_marker_aux)
+        .get_account(swap_marker_ata)
         .await
         .unwrap()
         .unwrap();

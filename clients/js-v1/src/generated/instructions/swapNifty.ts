@@ -61,7 +61,7 @@ export function getSwapNiftyInstructionDataSerializer(): Serializer<
     struct<SwapNiftyInstructionData>([['discriminator', u8()]], {
       description: 'SwapNiftyInstructionData',
     }),
-    (value) => ({ ...value, discriminator: 3 })
+    (value) => ({ ...value, discriminator: 2 })
   ) as Serializer<SwapNiftyInstructionDataArgs, SwapNiftyInstructionData>;
 }
 

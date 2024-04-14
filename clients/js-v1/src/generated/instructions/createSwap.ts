@@ -39,14 +39,16 @@ export type CreateSwapInstructionAccounts = {
   authority?: Signer;
   /** Escrows the asset and encodes state about the swap */
   swapMarker: PublicKey | Pda;
-  /** Auxiliary account for the swap marker: e.g. ATA */
-  swapMarkerAux?: PublicKey | Pda;
   /** The asset to be escrowed for the swap */
   incomingAsset: PublicKey | Pda;
-  /** Associated account for the incoming asset, e.g. token account */
-  incomingAssetAux?: PublicKey | Pda;
   /** External asset connected to the incoming asset */
   externalAsset: PublicKey | Pda;
+  /** Group account for the nifty asset, if applicable */
+  niftyAssetGroup?: PublicKey | Pda;
+  /** ATA account for the swap marker, if applicable */
+  swapMarkerAta?: PublicKey | Pda;
+  /** ATA account for the authority, if applicable */
+  authorityAta?: PublicKey | Pda;
   /** Transfer Program ID of the incoming asset */
   incomingAssetProgram: PublicKey | Pda;
   /** The SPL associated token program account program */
@@ -124,38 +126,43 @@ export function createSwap(
       isWritable: true as boolean,
       value: input.swapMarker ?? null,
     },
-    swapMarkerAux: {
-      index: 4,
-      isWritable: true as boolean,
-      value: input.swapMarkerAux ?? null,
-    },
     incomingAsset: {
-      index: 5,
+      index: 4,
       isWritable: true as boolean,
       value: input.incomingAsset ?? null,
     },
-    incomingAssetAux: {
-      index: 6,
-      isWritable: true as boolean,
-      value: input.incomingAssetAux ?? null,
-    },
     externalAsset: {
-      index: 7,
+      index: 5,
       isWritable: false as boolean,
       value: input.externalAsset ?? null,
     },
-    incomingAssetProgram: {
+    niftyAssetGroup: {
+      index: 6,
+      isWritable: true as boolean,
+      value: input.niftyAssetGroup ?? null,
+    },
+    swapMarkerAta: {
+      index: 7,
+      isWritable: true as boolean,
+      value: input.swapMarkerAta ?? null,
+    },
+    authorityAta: {
       index: 8,
+      isWritable: true as boolean,
+      value: input.authorityAta ?? null,
+    },
+    incomingAssetProgram: {
+      index: 9,
       isWritable: false as boolean,
       value: input.incomingAssetProgram ?? null,
     },
     associatedTokenProgram: {
-      index: 9,
+      index: 10,
       isWritable: false as boolean,
       value: input.associatedTokenProgram ?? null,
     },
     systemProgram: {
-      index: 10,
+      index: 11,
       isWritable: false as boolean,
       value: input.systemProgram ?? null,
     },

@@ -229,7 +229,7 @@ pub async fn create_nifty_swap<'a>(
         .namespace(authority)
         .authority(authority)
         .incoming_asset(mint)
-        .incoming_asset_aux(Some(ata))
+        .authority_ata(Some(ata))
         .incoming_amount(10)
         .external_asset(asset)
         .external_amount(1)

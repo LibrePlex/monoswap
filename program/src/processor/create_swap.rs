@@ -59,11 +59,11 @@ pub fn process_create_swap<'a>(
                 asset_info: ctx.accounts.incoming_asset,
                 signer_info: ctx.accounts.authority,
                 recipient_info: ctx.accounts.swap_marker,
-                group_asset_opt_info: ctx.accounts.incoming_asset_aux,
+                group_asset_opt_info: ctx.accounts.nifty_asset_group,
                 signer_seeds: &[],
             };
 
-            transfer_nifty(transfer_params)?;
+            check_and_transfer_nifty(transfer_params)?;
         }
         AssetType::SplToken => {
             msg!("SPL mint detected");
@@ -75,13 +75,13 @@ pub fn process_create_swap<'a>(
                 mint_info: ctx.accounts.incoming_asset,
                 source_owner_info: ctx.accounts.authority,
                 destination_owner_info: ctx.accounts.swap_marker,
-                source_ata_info: match ctx.accounts.incoming_asset_aux {
+                source_ata_info: match ctx.accounts.authority_ata {
                     Some(account_info) => account_info,
-                    None => return Err(MonoswapError::MissingIncomingAssetAux.into()),
+                    None => return Err(MonoswapError::MissingAuthorityAta.into()),
                 },
-                destination_ata_info: match ctx.accounts.swap_marker_aux {
+                destination_ata_info: match ctx.accounts.swap_marker_ata {
                     Some(account_info) => account_info,
-                    None => return Err(MonoswapError::MissingSwapMarkerAux.into()),
+                    None => return Err(MonoswapError::MissingSwapMarkerAta.into()),
                 },
                 amount: args.incoming_amount,
                 signer_seeds: &[],

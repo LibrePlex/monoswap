@@ -35,18 +35,16 @@ export const enum MonoswapProgramErrorCode {
   ININITALIZED_MINT = 0xc, // 12
   /** MissingNiftyGroup: Missing Nifty Group account */
   MISSING_NIFTY_GROUP = 0xd, // 13
-  /** MissingIncomingAssetAux: Missing incoming asset aux */
-  MISSING_INCOMING_ASSET_AUX = 0xe, // 14
-  /** MissingEscrowedAssetAux: Missing escrowed asset aux */
-  MISSING_ESCROWED_ASSET_AUX = 0xf, // 15
-  /** MissingSwapMarkerAux: Missing swap marker aux */
-  MISSING_SWAP_MARKER_AUX = 0x10, // 16
+  /** MissingAuthorityAta: Missing incoming asset aux */
+  MISSING_AUTHORITY_ATA = 0xe, // 14
+  /** MissingSwapMarkerAta: Missing swap marker aux */
+  MISSING_SWAP_MARKER_ATA = 0xf, // 15
   /** UnsupportedAssetType: Unsupported asset type */
-  UNSUPPORTED_ASSET_TYPE = 0x11, // 17
+  UNSUPPORTED_ASSET_TYPE = 0x10, // 16
   /** InvalidTokenProgram: Invalid Token Program */
-  INVALID_TOKEN_PROGRAM = 0x12, // 18
+  INVALID_TOKEN_PROGRAM = 0x11, // 17
   /** InvalidNiftyAsset: Invalid Nifty Asset */
-  INVALID_NIFTY_ASSET = 0x13, // 19
+  INVALID_NIFTY_ASSET = 0x12, // 18
 }
 
 export class MonoswapProgramError extends Error {
@@ -129,16 +127,12 @@ if (__DEV__) {
       'MissingNiftyGroup',
       `Missing Nifty Group account`,
     ],
-    [MonoswapProgramErrorCode.MISSING_INCOMING_ASSET_AUX]: [
-      'MissingIncomingAssetAux',
+    [MonoswapProgramErrorCode.MISSING_AUTHORITY_ATA]: [
+      'MissingAuthorityAta',
       `Missing incoming asset aux`,
     ],
-    [MonoswapProgramErrorCode.MISSING_ESCROWED_ASSET_AUX]: [
-      'MissingEscrowedAssetAux',
-      `Missing escrowed asset aux`,
-    ],
-    [MonoswapProgramErrorCode.MISSING_SWAP_MARKER_AUX]: [
-      'MissingSwapMarkerAux',
+    [MonoswapProgramErrorCode.MISSING_SWAP_MARKER_ATA]: [
+      'MissingSwapMarkerAta',
       `Missing swap marker aux`,
     ],
     [MonoswapProgramErrorCode.UNSUPPORTED_ASSET_TYPE]: [

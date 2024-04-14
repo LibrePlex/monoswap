@@ -27,25 +27,23 @@ import {
 } from '../shared';
 
 // Accounts.
-export type SwapInstructionAccounts = {
-  /** Account to pay for any accounts that need to be created */
+export type SwapNiftySPLInstructionAccounts = {
+  /** Account to pay for ATA creation */
   payer?: Signer;
   /** Authority to transfer incoming asset */
   authority?: Signer;
   /** Escrows the asset and encodes state about the swap */
   swapMarker: PublicKey | Pda;
-  /** The asset to be escrowed for the swap */
+  /** The currently escrowed asset */
   escrowedAsset: PublicKey | Pda;
-  /** External asset connected to the incoming asset */
+  /** External asset being swapped for the escrowed asset */
   incomingAsset: PublicKey | Pda;
-  /** Auxiliary account for the swap marker: e.g. ATA */
-  swapMarkerAuxIncoming?: PublicKey | Pda;
-  /** Auxiliary account for the swap marker: e.g. ATA */
-  swapMarkerAuxOutgoing?: PublicKey | Pda;
-  /** Associated account for the incoming asset, e.g. token account */
-  escrowedAssetAux?: PublicKey | Pda;
-  /** Associated account for the external asset, e.g. token account */
-  incomingAssetAux?: PublicKey | Pda;
+  /** Group account for the nifty asset, if applicable */
+  niftyAssetGroup?: PublicKey | Pda;
+  /** ATA account for the swap marker, if applicable */
+  swapMarkerAta?: PublicKey | Pda;
+  /** ATA account for the authority, if applicable */
+  authorityAta?: PublicKey | Pda;
   /** Transfer Program ID of the incoming asset */
   escrowedAssetProgram: PublicKey | Pda;
   /** Transfer Program ID of the external asset */
@@ -57,26 +55,30 @@ export type SwapInstructionAccounts = {
 };
 
 // Data.
-export type SwapInstructionData = { discriminator: number };
+export type SwapNiftySPLInstructionData = { discriminator: number };
 
-export type SwapInstructionDataArgs = {};
+export type SwapNiftySPLInstructionDataArgs = {};
 
-export function getSwapInstructionDataSerializer(): Serializer<
-  SwapInstructionDataArgs,
-  SwapInstructionData
+export function getSwapNiftySPLInstructionDataSerializer(): Serializer<
+  SwapNiftySPLInstructionDataArgs,
+  SwapNiftySPLInstructionData
 > {
-  return mapSerializer<SwapInstructionDataArgs, any, SwapInstructionData>(
-    struct<SwapInstructionData>([['discriminator', u8()]], {
-      description: 'SwapInstructionData',
+  return mapSerializer<
+    SwapNiftySPLInstructionDataArgs,
+    any,
+    SwapNiftySPLInstructionData
+  >(
+    struct<SwapNiftySPLInstructionData>([['discriminator', u8()]], {
+      description: 'SwapNiftySPLInstructionData',
     }),
-    (value) => ({ ...value, discriminator: 1 })
-  ) as Serializer<SwapInstructionDataArgs, SwapInstructionData>;
+    (value) => ({ ...value, discriminator: 3 })
+  ) as Serializer<SwapNiftySPLInstructionDataArgs, SwapNiftySPLInstructionData>;
 }
 
 // Instruction.
-export function swap(
+export function swapNiftySPL(
   context: Pick<Context, 'identity' | 'payer' | 'programs'>,
-  input: SwapInstructionAccounts
+  input: SwapNiftySPLInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
@@ -111,43 +113,38 @@ export function swap(
       isWritable: true as boolean,
       value: input.incomingAsset ?? null,
     },
-    swapMarkerAuxIncoming: {
+    niftyAssetGroup: {
       index: 5,
       isWritable: true as boolean,
-      value: input.swapMarkerAuxIncoming ?? null,
+      value: input.niftyAssetGroup ?? null,
     },
-    swapMarkerAuxOutgoing: {
+    swapMarkerAta: {
       index: 6,
       isWritable: true as boolean,
-      value: input.swapMarkerAuxOutgoing ?? null,
+      value: input.swapMarkerAta ?? null,
     },
-    escrowedAssetAux: {
+    authorityAta: {
       index: 7,
       isWritable: true as boolean,
-      value: input.escrowedAssetAux ?? null,
-    },
-    incomingAssetAux: {
-      index: 8,
-      isWritable: true as boolean,
-      value: input.incomingAssetAux ?? null,
+      value: input.authorityAta ?? null,
     },
     escrowedAssetProgram: {
-      index: 9,
+      index: 8,
       isWritable: false as boolean,
       value: input.escrowedAssetProgram ?? null,
     },
     incomingAssetProgram: {
-      index: 10,
+      index: 9,
       isWritable: false as boolean,
       value: input.incomingAssetProgram ?? null,
     },
     associatedTokenProgram: {
-      index: 11,
+      index: 10,
       isWritable: false as boolean,
       value: input.associatedTokenProgram ?? null,
     },
     systemProgram: {
-      index: 12,
+      index: 11,
       isWritable: false as boolean,
       value: input.systemProgram ?? null,
     },
@@ -181,7 +178,7 @@ export function swap(
   );
 
   // Data.
-  const data = getSwapInstructionDataSerializer().serialize({});
+  const data = getSwapNiftySPLInstructionDataSerializer().serialize({});
 
   // Bytes Created On Chain.
   const bytesCreatedOnChain = 0;

@@ -46,10 +46,11 @@ export type CreateSwapInstruction<
   TAccountNamespace extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
   TAccountSwapMarker extends string | IAccountMeta<string> = string,
-  TAccountSwapMarkerAux extends string | IAccountMeta<string> = string,
   TAccountIncomingAsset extends string | IAccountMeta<string> = string,
-  TAccountIncomingAssetAux extends string | IAccountMeta<string> = string,
   TAccountExternalAsset extends string | IAccountMeta<string> = string,
+  TAccountNiftyAssetGroup extends string | IAccountMeta<string> = string,
+  TAccountSwapMarkerAta extends string | IAccountMeta<string> = string,
+  TAccountAuthorityAta extends string | IAccountMeta<string> = string,
   TAccountIncomingAssetProgram extends string | IAccountMeta<string> = string,
   TAccountAssociatedTokenProgram extends string | IAccountMeta<string> = string,
   TAccountSystemProgram extends
@@ -75,18 +76,21 @@ export type CreateSwapInstruction<
       TAccountSwapMarker extends string
         ? WritableAccount<TAccountSwapMarker>
         : TAccountSwapMarker,
-      TAccountSwapMarkerAux extends string
-        ? WritableAccount<TAccountSwapMarkerAux>
-        : TAccountSwapMarkerAux,
       TAccountIncomingAsset extends string
         ? WritableAccount<TAccountIncomingAsset>
         : TAccountIncomingAsset,
-      TAccountIncomingAssetAux extends string
-        ? WritableAccount<TAccountIncomingAssetAux>
-        : TAccountIncomingAssetAux,
       TAccountExternalAsset extends string
         ? ReadonlyAccount<TAccountExternalAsset>
         : TAccountExternalAsset,
+      TAccountNiftyAssetGroup extends string
+        ? WritableAccount<TAccountNiftyAssetGroup>
+        : TAccountNiftyAssetGroup,
+      TAccountSwapMarkerAta extends string
+        ? WritableAccount<TAccountSwapMarkerAta>
+        : TAccountSwapMarkerAta,
+      TAccountAuthorityAta extends string
+        ? WritableAccount<TAccountAuthorityAta>
+        : TAccountAuthorityAta,
       TAccountIncomingAssetProgram extends string
         ? ReadonlyAccount<TAccountIncomingAssetProgram>
         : TAccountIncomingAssetProgram,
@@ -145,10 +149,11 @@ export type CreateSwapInput<
   TAccountNamespace extends string = string,
   TAccountAuthority extends string = string,
   TAccountSwapMarker extends string = string,
-  TAccountSwapMarkerAux extends string = string,
   TAccountIncomingAsset extends string = string,
-  TAccountIncomingAssetAux extends string = string,
   TAccountExternalAsset extends string = string,
+  TAccountNiftyAssetGroup extends string = string,
+  TAccountSwapMarkerAta extends string = string,
+  TAccountAuthorityAta extends string = string,
   TAccountIncomingAssetProgram extends string = string,
   TAccountAssociatedTokenProgram extends string = string,
   TAccountSystemProgram extends string = string,
@@ -161,14 +166,16 @@ export type CreateSwapInput<
   authority: TransactionSigner<TAccountAuthority>;
   /** Escrows the asset and encodes state about the swap */
   swapMarker: Address<TAccountSwapMarker>;
-  /** Auxiliary account for the swap marker: e.g. ATA */
-  swapMarkerAux?: Address<TAccountSwapMarkerAux>;
   /** The asset to be escrowed for the swap */
   incomingAsset: Address<TAccountIncomingAsset>;
-  /** Associated account for the incoming asset, e.g. token account */
-  incomingAssetAux?: Address<TAccountIncomingAssetAux>;
   /** External asset connected to the incoming asset */
   externalAsset: Address<TAccountExternalAsset>;
+  /** Group account for the nifty asset, if applicable */
+  niftyAssetGroup?: Address<TAccountNiftyAssetGroup>;
+  /** ATA account for the swap marker, if applicable */
+  swapMarkerAta?: Address<TAccountSwapMarkerAta>;
+  /** ATA account for the authority, if applicable */
+  authorityAta?: Address<TAccountAuthorityAta>;
   /** Transfer Program ID of the incoming asset */
   incomingAssetProgram: Address<TAccountIncomingAssetProgram>;
   /** The SPL associated token program account program */
@@ -184,10 +191,11 @@ export function getCreateSwapInstruction<
   TAccountNamespace extends string,
   TAccountAuthority extends string,
   TAccountSwapMarker extends string,
-  TAccountSwapMarkerAux extends string,
   TAccountIncomingAsset extends string,
-  TAccountIncomingAssetAux extends string,
   TAccountExternalAsset extends string,
+  TAccountNiftyAssetGroup extends string,
+  TAccountSwapMarkerAta extends string,
+  TAccountAuthorityAta extends string,
   TAccountIncomingAssetProgram extends string,
   TAccountAssociatedTokenProgram extends string,
   TAccountSystemProgram extends string,
@@ -197,10 +205,11 @@ export function getCreateSwapInstruction<
     TAccountNamespace,
     TAccountAuthority,
     TAccountSwapMarker,
-    TAccountSwapMarkerAux,
     TAccountIncomingAsset,
-    TAccountIncomingAssetAux,
     TAccountExternalAsset,
+    TAccountNiftyAssetGroup,
+    TAccountSwapMarkerAta,
+    TAccountAuthorityAta,
     TAccountIncomingAssetProgram,
     TAccountAssociatedTokenProgram,
     TAccountSystemProgram
@@ -211,10 +220,11 @@ export function getCreateSwapInstruction<
   TAccountNamespace,
   TAccountAuthority,
   TAccountSwapMarker,
-  TAccountSwapMarkerAux,
   TAccountIncomingAsset,
-  TAccountIncomingAssetAux,
   TAccountExternalAsset,
+  TAccountNiftyAssetGroup,
+  TAccountSwapMarkerAta,
+  TAccountAuthorityAta,
   TAccountIncomingAssetProgram,
   TAccountAssociatedTokenProgram,
   TAccountSystemProgram
@@ -229,13 +239,11 @@ export function getCreateSwapInstruction<
     namespace: { value: input.namespace ?? null, isWritable: false },
     authority: { value: input.authority ?? null, isWritable: false },
     swapMarker: { value: input.swapMarker ?? null, isWritable: true },
-    swapMarkerAux: { value: input.swapMarkerAux ?? null, isWritable: true },
     incomingAsset: { value: input.incomingAsset ?? null, isWritable: true },
-    incomingAssetAux: {
-      value: input.incomingAssetAux ?? null,
-      isWritable: true,
-    },
     externalAsset: { value: input.externalAsset ?? null, isWritable: false },
+    niftyAssetGroup: { value: input.niftyAssetGroup ?? null, isWritable: true },
+    swapMarkerAta: { value: input.swapMarkerAta ?? null, isWritable: true },
+    authorityAta: { value: input.authorityAta ?? null, isWritable: true },
     incomingAssetProgram: {
       value: input.incomingAssetProgram ?? null,
       isWritable: false,
@@ -273,10 +281,11 @@ export function getCreateSwapInstruction<
       getAccountMeta(accounts.namespace),
       getAccountMeta(accounts.authority),
       getAccountMeta(accounts.swapMarker),
-      getAccountMeta(accounts.swapMarkerAux),
       getAccountMeta(accounts.incomingAsset),
-      getAccountMeta(accounts.incomingAssetAux),
       getAccountMeta(accounts.externalAsset),
+      getAccountMeta(accounts.niftyAssetGroup),
+      getAccountMeta(accounts.swapMarkerAta),
+      getAccountMeta(accounts.authorityAta),
       getAccountMeta(accounts.incomingAssetProgram),
       getAccountMeta(accounts.associatedTokenProgram),
       getAccountMeta(accounts.systemProgram),
@@ -291,10 +300,11 @@ export function getCreateSwapInstruction<
     TAccountNamespace,
     TAccountAuthority,
     TAccountSwapMarker,
-    TAccountSwapMarkerAux,
     TAccountIncomingAsset,
-    TAccountIncomingAssetAux,
     TAccountExternalAsset,
+    TAccountNiftyAssetGroup,
+    TAccountSwapMarkerAta,
+    TAccountAuthorityAta,
     TAccountIncomingAssetProgram,
     TAccountAssociatedTokenProgram,
     TAccountSystemProgram
@@ -317,20 +327,22 @@ export type ParsedCreateSwapInstruction<
     authority: TAccountMetas[2];
     /** Escrows the asset and encodes state about the swap */
     swapMarker: TAccountMetas[3];
-    /** Auxiliary account for the swap marker: e.g. ATA */
-    swapMarkerAux?: TAccountMetas[4] | undefined;
     /** The asset to be escrowed for the swap */
-    incomingAsset: TAccountMetas[5];
-    /** Associated account for the incoming asset, e.g. token account */
-    incomingAssetAux?: TAccountMetas[6] | undefined;
+    incomingAsset: TAccountMetas[4];
     /** External asset connected to the incoming asset */
-    externalAsset: TAccountMetas[7];
+    externalAsset: TAccountMetas[5];
+    /** Group account for the nifty asset, if applicable */
+    niftyAssetGroup?: TAccountMetas[6] | undefined;
+    /** ATA account for the swap marker, if applicable */
+    swapMarkerAta?: TAccountMetas[7] | undefined;
+    /** ATA account for the authority, if applicable */
+    authorityAta?: TAccountMetas[8] | undefined;
     /** Transfer Program ID of the incoming asset */
-    incomingAssetProgram: TAccountMetas[8];
+    incomingAssetProgram: TAccountMetas[9];
     /** The SPL associated token program account program */
-    associatedTokenProgram?: TAccountMetas[9] | undefined;
+    associatedTokenProgram?: TAccountMetas[10] | undefined;
     /** System program account */
-    systemProgram: TAccountMetas[10];
+    systemProgram: TAccountMetas[11];
   };
   data: CreateSwapInstructionData;
 };
@@ -343,7 +355,7 @@ export function parseCreateSwapInstruction<
     IInstructionWithAccounts<TAccountMetas> &
     IInstructionWithData<Uint8Array>
 ): ParsedCreateSwapInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 11) {
+  if (instruction.accounts.length < 12) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
   }
@@ -366,10 +378,11 @@ export function parseCreateSwapInstruction<
       namespace: getNextAccount(),
       authority: getNextAccount(),
       swapMarker: getNextAccount(),
-      swapMarkerAux: getNextOptionalAccount(),
       incomingAsset: getNextAccount(),
-      incomingAssetAux: getNextOptionalAccount(),
       externalAsset: getNextAccount(),
+      niftyAssetGroup: getNextOptionalAccount(),
+      swapMarkerAta: getNextOptionalAccount(),
+      authorityAta: getNextOptionalAccount(),
       incomingAssetProgram: getNextAccount(),
       associatedTokenProgram: getNextOptionalAccount(),
       systemProgram: getNextAccount(),

@@ -96,7 +96,7 @@ struct SwapNiftyInstructionData {
 
 impl SwapNiftyInstructionData {
     fn new() -> Self {
-        Self { discriminator: 3 }
+        Self { discriminator: 2 }
     }
 }
 

@@ -6,11 +6,11 @@
 //!
 
 pub(crate) mod r#create_swap;
-pub(crate) mod r#swap;
 pub(crate) mod r#swap_nifty;
+pub(crate) mod r#swap_nifty_s_p_l;
 pub(crate) mod r#swap_s_p_l;
 
 pub use self::r#create_swap::*;
-pub use self::r#swap::*;
 pub use self::r#swap_nifty::*;
+pub use self::r#swap_nifty_s_p_l::*;
 pub use self::r#swap_s_p_l::*;

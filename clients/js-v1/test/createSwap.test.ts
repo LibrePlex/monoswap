@@ -97,9 +97,9 @@ test('it can create a nifty-to-fungible asset swap', async (t) => {
     namespace: authority,
     authority,
     swapMarker,
-    swapMarkerAux: swapMarkerAta,
+    swapMarkerAta,
     incomingAsset: mint.publicKey, // Fungible incoming to be escrowed in the contract
-    incomingAssetAux: ata,
+    authorityAta: ata,
     externalAsset: asset.publicKey, // Nifty asset to be entangled with the fungibles
     incomingAssetProgram: SPL_TOKEN_PROGRAM_ID,
     associatedTokenProgram: SPL_ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -334,7 +334,7 @@ test('it can create a fungible-to-fungible asset swap', async (t) => {
     tokenProgramId: SPL_TOKEN_PROGRAM_ID,
   });
 
-  const sourceAta = findAssociatedTokenPda(umi, {
+  const authorityAta = findAssociatedTokenPda(umi, {
     mint: incomingMint.publicKey,
     owner: authority.publicKey,
     tokenProgramId: SPL_TOKEN_PROGRAM_ID,
@@ -345,9 +345,9 @@ test('it can create a fungible-to-fungible asset swap', async (t) => {
     namespace: authority,
     authority,
     swapMarker,
-    swapMarkerAux: swapMarkerAta,
+    swapMarkerAta,
     incomingAsset: incomingMint.publicKey,
-    incomingAssetAux: sourceAta,
+    authorityAta,
     externalAsset: externalMint.publicKey,
     incomingAssetProgram: SPL_TOKEN_PROGRAM_ID,
     associatedTokenProgram: SPL_ASSOCIATED_TOKEN_PROGRAM_ID,

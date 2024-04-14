@@ -106,7 +106,7 @@ export type SwapSPLInstructionDataArgs = {};
 export function getSwapSPLInstructionDataEncoder(): Encoder<SwapSPLInstructionDataArgs> {
   return mapEncoder(
     getStructEncoder([['discriminator', getU8Encoder()]]),
-    (value) => ({ ...value, discriminator: 2 })
+    (value) => ({ ...value, discriminator: 1 })
   );
 }
 

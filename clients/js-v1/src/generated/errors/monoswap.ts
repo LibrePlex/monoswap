@@ -201,9 +201,9 @@ export class MissingNiftyGroupError extends ProgramError {
 codeToErrorMap.set(0xd, MissingNiftyGroupError);
 nameToErrorMap.set('MissingNiftyGroup', MissingNiftyGroupError);
 
-/** MissingIncomingAssetAux: Missing incoming asset aux */
-export class MissingIncomingAssetAuxError extends ProgramError {
-  override readonly name: string = 'MissingIncomingAssetAux';
+/** MissingAuthorityAta: Missing incoming asset aux */
+export class MissingAuthorityAtaError extends ProgramError {
+  override readonly name: string = 'MissingAuthorityAta';
 
   readonly code: number = 0xe; // 14
 
@@ -211,72 +211,59 @@ export class MissingIncomingAssetAuxError extends ProgramError {
     super('Missing incoming asset aux', program, cause);
   }
 }
-codeToErrorMap.set(0xe, MissingIncomingAssetAuxError);
-nameToErrorMap.set('MissingIncomingAssetAux', MissingIncomingAssetAuxError);
+codeToErrorMap.set(0xe, MissingAuthorityAtaError);
+nameToErrorMap.set('MissingAuthorityAta', MissingAuthorityAtaError);
 
-/** MissingEscrowedAssetAux: Missing escrowed asset aux */
-export class MissingEscrowedAssetAuxError extends ProgramError {
-  override readonly name: string = 'MissingEscrowedAssetAux';
+/** MissingSwapMarkerAta: Missing swap marker aux */
+export class MissingSwapMarkerAtaError extends ProgramError {
+  override readonly name: string = 'MissingSwapMarkerAta';
 
   readonly code: number = 0xf; // 15
-
-  constructor(program: Program, cause?: Error) {
-    super('Missing escrowed asset aux', program, cause);
-  }
-}
-codeToErrorMap.set(0xf, MissingEscrowedAssetAuxError);
-nameToErrorMap.set('MissingEscrowedAssetAux', MissingEscrowedAssetAuxError);
-
-/** MissingSwapMarkerAux: Missing swap marker aux */
-export class MissingSwapMarkerAuxError extends ProgramError {
-  override readonly name: string = 'MissingSwapMarkerAux';
-
-  readonly code: number = 0x10; // 16
 
   constructor(program: Program, cause?: Error) {
     super('Missing swap marker aux', program, cause);
   }
 }
-codeToErrorMap.set(0x10, MissingSwapMarkerAuxError);
-nameToErrorMap.set('MissingSwapMarkerAux', MissingSwapMarkerAuxError);
+codeToErrorMap.set(0xf, MissingSwapMarkerAtaError);
+nameToErrorMap.set('MissingSwapMarkerAta', MissingSwapMarkerAtaError);
 
 /** UnsupportedAssetType: Unsupported asset type */
 export class UnsupportedAssetTypeError extends ProgramError {
   override readonly name: string = 'UnsupportedAssetType';
 
-  readonly code: number = 0x11; // 17
+  readonly code: number = 0x10; // 16
 
   constructor(program: Program, cause?: Error) {
     super('Unsupported asset type', program, cause);
   }
 }
-codeToErrorMap.set(0x11, UnsupportedAssetTypeError);
+codeToErrorMap.set(0x10, UnsupportedAssetTypeError);
 nameToErrorMap.set('UnsupportedAssetType', UnsupportedAssetTypeError);
 
 /** InvalidTokenProgram: Invalid Token Program */
 export class InvalidTokenProgramError extends ProgramError {
   override readonly name: string = 'InvalidTokenProgram';
 
-  readonly code: number = 0x12; // 18
+  readonly code: number = 0x11; // 17
 
   constructor(program: Program, cause?: Error) {
     super('Invalid Token Program', program, cause);
   }
 }
-codeToErrorMap.set(0x12, InvalidTokenProgramError);
+codeToErrorMap.set(0x11, InvalidTokenProgramError);
 nameToErrorMap.set('InvalidTokenProgram', InvalidTokenProgramError);
 
 /** InvalidNiftyAsset: Invalid Nifty Asset */
 export class InvalidNiftyAssetError extends ProgramError {
   override readonly name: string = 'InvalidNiftyAsset';
 
-  readonly code: number = 0x13; // 19
+  readonly code: number = 0x12; // 18
 
   constructor(program: Program, cause?: Error) {
     super('Invalid Nifty Asset', program, cause);
   }
 }
-codeToErrorMap.set(0x13, InvalidNiftyAssetError);
+codeToErrorMap.set(0x12, InvalidNiftyAssetError);
 nameToErrorMap.set('InvalidNiftyAsset', InvalidNiftyAssetError);
 
 /**

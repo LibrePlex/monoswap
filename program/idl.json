@@ -38,15 +38,6 @@
           ]
         },
         {
-          "name": "swapMarkerAux",
-          "isMut": true,
-          "isSigner": false,
-          "isOptional": true,
-          "docs": [
-            "Auxiliary account for the swap marker: e.g. ATA"
-          ]
-        },
-        {
           "name": "incomingAsset",
           "isMut": true,
           "isSigner": false,
@@ -55,20 +46,38 @@
           ]
         },
         {
-          "name": "incomingAssetAux",
-          "isMut": true,
-          "isSigner": false,
-          "isOptional": true,
-          "docs": [
-            "Associated account for the incoming asset, e.g. token account"
-          ]
-        },
-        {
           "name": "externalAsset",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "External asset connected to the incoming asset"
+          ]
+        },
+        {
+          "name": "niftyAssetGroup",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "Group account for the nifty asset, if applicable"
+          ]
+        },
+        {
+          "name": "swapMarkerAta",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "ATA account for the swap marker, if applicable"
+          ]
+        },
+        {
+          "name": "authorityAta",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "ATA account for the authority, if applicable"
           ]
         },
         {
@@ -108,125 +117,6 @@
       "discriminant": {
         "type": "u8",
         "value": 0
-      }
-    },
-    {
-      "name": "Swap",
-      "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true,
-          "docs": [
-            "Account to pay for any accounts that need to be created"
-          ]
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true,
-          "docs": [
-            "Authority to transfer incoming asset"
-          ]
-        },
-        {
-          "name": "swapMarker",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Escrows the asset and encodes state about the swap"
-          ]
-        },
-        {
-          "name": "escrowedAsset",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "The asset to be escrowed for the swap"
-          ]
-        },
-        {
-          "name": "incomingAsset",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "External asset connected to the incoming asset"
-          ]
-        },
-        {
-          "name": "swapMarkerAuxIncoming",
-          "isMut": true,
-          "isSigner": false,
-          "isOptional": true,
-          "docs": [
-            "Auxiliary account for the swap marker: e.g. ATA"
-          ]
-        },
-        {
-          "name": "swapMarkerAuxOutgoing",
-          "isMut": true,
-          "isSigner": false,
-          "isOptional": true,
-          "docs": [
-            "Auxiliary account for the swap marker: e.g. ATA"
-          ]
-        },
-        {
-          "name": "escrowedAssetAux",
-          "isMut": true,
-          "isSigner": false,
-          "isOptional": true,
-          "docs": [
-            "Associated account for the incoming asset, e.g. token account"
-          ]
-        },
-        {
-          "name": "incomingAssetAux",
-          "isMut": true,
-          "isSigner": false,
-          "isOptional": true,
-          "docs": [
-            "Associated account for the external asset, e.g. token account"
-          ]
-        },
-        {
-          "name": "escrowedAssetProgram",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "Transfer Program ID of the incoming asset"
-          ]
-        },
-        {
-          "name": "incomingAssetProgram",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "Transfer Program ID of the external asset"
-          ]
-        },
-        {
-          "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true,
-          "docs": [
-            "The SPL associated token program account program"
-          ]
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "System program account"
-          ]
-        }
-      ],
-      "args": [],
-      "discriminant": {
-        "type": "u8",
-        "value": 1
       }
     },
     {
@@ -341,7 +231,7 @@
       "args": [],
       "discriminant": {
         "type": "u8",
-        "value": 2
+        "value": 1
       }
     },
     {
@@ -403,6 +293,116 @@
           "isSigner": false,
           "docs": [
             "Nifty asset program account"
+          ]
+        }
+      ],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 2
+      }
+    },
+    {
+      "name": "SwapNiftySPL",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "Account to pay for ATA creation"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "Authority to transfer incoming asset"
+          ]
+        },
+        {
+          "name": "swapMarker",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Escrows the asset and encodes state about the swap"
+          ]
+        },
+        {
+          "name": "escrowedAsset",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The currently escrowed asset"
+          ]
+        },
+        {
+          "name": "incomingAsset",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "External asset being swapped for the escrowed asset"
+          ]
+        },
+        {
+          "name": "niftyAssetGroup",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "Group account for the nifty asset, if applicable"
+          ]
+        },
+        {
+          "name": "swapMarkerAta",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "ATA account for the swap marker, if applicable"
+          ]
+        },
+        {
+          "name": "authorityAta",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "ATA account for the authority, if applicable"
+          ]
+        },
+        {
+          "name": "escrowedAssetProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Transfer Program ID of the incoming asset"
+          ]
+        },
+        {
+          "name": "incomingAssetProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Transfer Program ID of the external asset"
+          ]
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The SPL associated token program account program"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "System program account"
           ]
         }
       ],
@@ -595,31 +595,26 @@
     },
     {
       "code": 14,
-      "name": "MissingIncomingAssetAux",
+      "name": "MissingAuthorityAta",
       "msg": "Missing incoming asset aux"
     },
     {
       "code": 15,
-      "name": "MissingEscrowedAssetAux",
-      "msg": "Missing escrowed asset aux"
-    },
-    {
-      "code": 16,
-      "name": "MissingSwapMarkerAux",
+      "name": "MissingSwapMarkerAta",
       "msg": "Missing swap marker aux"
     },
     {
-      "code": 17,
+      "code": 16,
       "name": "UnsupportedAssetType",
       "msg": "Unsupported asset type"
     },
     {
-      "code": 18,
+      "code": 17,
       "name": "InvalidTokenProgram",
       "msg": "Invalid Token Program"
     },
     {
-      "code": 19,
+      "code": 18,
       "name": "InvalidNiftyAsset",
       "msg": "Invalid Nifty Asset"
     }

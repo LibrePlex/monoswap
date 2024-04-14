@@ -9,25 +9,23 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
 /// Accounts.
-pub struct Swap {
-    /// Account to pay for any accounts that need to be created
+pub struct SwapNiftySPL {
+    /// Account to pay for ATA creation
     pub payer: solana_program::pubkey::Pubkey,
     /// Authority to transfer incoming asset
     pub authority: solana_program::pubkey::Pubkey,
     /// Escrows the asset and encodes state about the swap
     pub swap_marker: solana_program::pubkey::Pubkey,
-    /// The asset to be escrowed for the swap
+    /// The currently escrowed asset
     pub escrowed_asset: solana_program::pubkey::Pubkey,
-    /// External asset connected to the incoming asset
+    /// External asset being swapped for the escrowed asset
     pub incoming_asset: solana_program::pubkey::Pubkey,
-    /// Auxiliary account for the swap marker: e.g. ATA
-    pub swap_marker_aux_incoming: Option<solana_program::pubkey::Pubkey>,
-    /// Auxiliary account for the swap marker: e.g. ATA
-    pub swap_marker_aux_outgoing: Option<solana_program::pubkey::Pubkey>,
-    /// Associated account for the incoming asset, e.g. token account
-    pub escrowed_asset_aux: Option<solana_program::pubkey::Pubkey>,
-    /// Associated account for the external asset, e.g. token account
-    pub incoming_asset_aux: Option<solana_program::pubkey::Pubkey>,
+    /// Group account for the nifty asset, if applicable
+    pub nifty_asset_group: Option<solana_program::pubkey::Pubkey>,
+    /// ATA account for the swap marker, if applicable
+    pub swap_marker_ata: Option<solana_program::pubkey::Pubkey>,
+    /// ATA account for the authority, if applicable
+    pub authority_ata: Option<solana_program::pubkey::Pubkey>,
     /// Transfer Program ID of the incoming asset
     pub escrowed_asset_program: solana_program::pubkey::Pubkey,
     /// Transfer Program ID of the external asset
@@ -38,7 +36,7 @@ pub struct Swap {
     pub system_program: solana_program::pubkey::Pubkey,
 }
 
-impl Swap {
+impl SwapNiftySPL {
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
         self.instruction_with_remaining_accounts(&[])
     }
@@ -47,7 +45,7 @@ impl Swap {
         &self,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(13 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(12 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.payer, true,
         ));
@@ -67,9 +65,9 @@ impl Swap {
             self.incoming_asset,
             false,
         ));
-        if let Some(swap_marker_aux_incoming) = self.swap_marker_aux_incoming {
+        if let Some(nifty_asset_group) = self.nifty_asset_group {
             accounts.push(solana_program::instruction::AccountMeta::new(
-                swap_marker_aux_incoming,
+                nifty_asset_group,
                 false,
             ));
         } else {
@@ -78,9 +76,9 @@ impl Swap {
                 false,
             ));
         }
-        if let Some(swap_marker_aux_outgoing) = self.swap_marker_aux_outgoing {
+        if let Some(swap_marker_ata) = self.swap_marker_ata {
             accounts.push(solana_program::instruction::AccountMeta::new(
-                swap_marker_aux_outgoing,
+                swap_marker_ata,
                 false,
             ));
         } else {
@@ -89,20 +87,9 @@ impl Swap {
                 false,
             ));
         }
-        if let Some(escrowed_asset_aux) = self.escrowed_asset_aux {
+        if let Some(authority_ata) = self.authority_ata {
             accounts.push(solana_program::instruction::AccountMeta::new(
-                escrowed_asset_aux,
-                false,
-            ));
-        } else {
-            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                crate::MONOSWAP_ID,
-                false,
-            ));
-        }
-        if let Some(incoming_asset_aux) = self.incoming_asset_aux {
-            accounts.push(solana_program::instruction::AccountMeta::new(
-                incoming_asset_aux,
+                authority_ata,
                 false,
             ));
         } else {
@@ -135,7 +122,7 @@ impl Swap {
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
-        let data = SwapInstructionData::new().try_to_vec().unwrap();
+        let data = SwapNiftySPLInstructionData::new().try_to_vec().unwrap();
 
         solana_program::instruction::Instruction {
             program_id: crate::MONOSWAP_ID,
@@ -146,17 +133,17 @@ impl Swap {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct SwapInstructionData {
+struct SwapNiftySPLInstructionData {
     discriminator: u8,
 }
 
-impl SwapInstructionData {
+impl SwapNiftySPLInstructionData {
     fn new() -> Self {
-        Self { discriminator: 1 }
+        Self { discriminator: 3 }
     }
 }
 
-/// Instruction builder for `Swap`.
+/// Instruction builder for `SwapNiftySPL`.
 ///
 /// ### Accounts:
 ///
@@ -165,25 +152,23 @@ impl SwapInstructionData {
 ///   2. `[writable]` swap_marker
 ///   3. `[writable]` escrowed_asset
 ///   4. `[writable]` incoming_asset
-///   5. `[writable, optional]` swap_marker_aux_incoming
-///   6. `[writable, optional]` swap_marker_aux_outgoing
-///   7. `[writable, optional]` escrowed_asset_aux
-///   8. `[writable, optional]` incoming_asset_aux
-///   9. `[]` escrowed_asset_program
-///   10. `[]` incoming_asset_program
-///   11. `[optional]` associated_token_program
-///   12. `[optional]` system_program (default to `11111111111111111111111111111111`)
+///   5. `[writable, optional]` nifty_asset_group
+///   6. `[writable, optional]` swap_marker_ata
+///   7. `[writable, optional]` authority_ata
+///   8. `[]` escrowed_asset_program
+///   9. `[]` incoming_asset_program
+///   10. `[optional]` associated_token_program
+///   11. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Default)]
-pub struct SwapBuilder {
+pub struct SwapNiftySPLBuilder {
     payer: Option<solana_program::pubkey::Pubkey>,
     authority: Option<solana_program::pubkey::Pubkey>,
     swap_marker: Option<solana_program::pubkey::Pubkey>,
     escrowed_asset: Option<solana_program::pubkey::Pubkey>,
     incoming_asset: Option<solana_program::pubkey::Pubkey>,
-    swap_marker_aux_incoming: Option<solana_program::pubkey::Pubkey>,
-    swap_marker_aux_outgoing: Option<solana_program::pubkey::Pubkey>,
-    escrowed_asset_aux: Option<solana_program::pubkey::Pubkey>,
-    incoming_asset_aux: Option<solana_program::pubkey::Pubkey>,
+    nifty_asset_group: Option<solana_program::pubkey::Pubkey>,
+    swap_marker_ata: Option<solana_program::pubkey::Pubkey>,
+    authority_ata: Option<solana_program::pubkey::Pubkey>,
     escrowed_asset_program: Option<solana_program::pubkey::Pubkey>,
     incoming_asset_program: Option<solana_program::pubkey::Pubkey>,
     associated_token_program: Option<solana_program::pubkey::Pubkey>,
@@ -191,11 +176,11 @@ pub struct SwapBuilder {
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
-impl SwapBuilder {
+impl SwapNiftySPLBuilder {
     pub fn new() -> Self {
         Self::default()
     }
-    /// Account to pay for any accounts that need to be created
+    /// Account to pay for ATA creation
     #[inline(always)]
     pub fn payer(&mut self, payer: solana_program::pubkey::Pubkey) -> &mut Self {
         self.payer = Some(payer);
@@ -213,56 +198,46 @@ impl SwapBuilder {
         self.swap_marker = Some(swap_marker);
         self
     }
-    /// The asset to be escrowed for the swap
+    /// The currently escrowed asset
     #[inline(always)]
     pub fn escrowed_asset(&mut self, escrowed_asset: solana_program::pubkey::Pubkey) -> &mut Self {
         self.escrowed_asset = Some(escrowed_asset);
         self
     }
-    /// External asset connected to the incoming asset
+    /// External asset being swapped for the escrowed asset
     #[inline(always)]
     pub fn incoming_asset(&mut self, incoming_asset: solana_program::pubkey::Pubkey) -> &mut Self {
         self.incoming_asset = Some(incoming_asset);
         self
     }
     /// `[optional account]`
-    /// Auxiliary account for the swap marker: e.g. ATA
+    /// Group account for the nifty asset, if applicable
     #[inline(always)]
-    pub fn swap_marker_aux_incoming(
+    pub fn nifty_asset_group(
         &mut self,
-        swap_marker_aux_incoming: Option<solana_program::pubkey::Pubkey>,
+        nifty_asset_group: Option<solana_program::pubkey::Pubkey>,
     ) -> &mut Self {
-        self.swap_marker_aux_incoming = swap_marker_aux_incoming;
+        self.nifty_asset_group = nifty_asset_group;
         self
     }
     /// `[optional account]`
-    /// Auxiliary account for the swap marker: e.g. ATA
+    /// ATA account for the swap marker, if applicable
     #[inline(always)]
-    pub fn swap_marker_aux_outgoing(
+    pub fn swap_marker_ata(
         &mut self,
-        swap_marker_aux_outgoing: Option<solana_program::pubkey::Pubkey>,
+        swap_marker_ata: Option<solana_program::pubkey::Pubkey>,
     ) -> &mut Self {
-        self.swap_marker_aux_outgoing = swap_marker_aux_outgoing;
+        self.swap_marker_ata = swap_marker_ata;
         self
     }
     /// `[optional account]`
-    /// Associated account for the incoming asset, e.g. token account
+    /// ATA account for the authority, if applicable
     #[inline(always)]
-    pub fn escrowed_asset_aux(
+    pub fn authority_ata(
         &mut self,
-        escrowed_asset_aux: Option<solana_program::pubkey::Pubkey>,
+        authority_ata: Option<solana_program::pubkey::Pubkey>,
     ) -> &mut Self {
-        self.escrowed_asset_aux = escrowed_asset_aux;
-        self
-    }
-    /// `[optional account]`
-    /// Associated account for the external asset, e.g. token account
-    #[inline(always)]
-    pub fn incoming_asset_aux(
-        &mut self,
-        incoming_asset_aux: Option<solana_program::pubkey::Pubkey>,
-    ) -> &mut Self {
-        self.incoming_asset_aux = incoming_asset_aux;
+        self.authority_ata = authority_ata;
         self
     }
     /// Transfer Program ID of the incoming asset
@@ -320,16 +295,15 @@ impl SwapBuilder {
     }
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
-        let accounts = Swap {
+        let accounts = SwapNiftySPL {
             payer: self.payer.expect("payer is not set"),
             authority: self.authority.expect("authority is not set"),
             swap_marker: self.swap_marker.expect("swap_marker is not set"),
             escrowed_asset: self.escrowed_asset.expect("escrowed_asset is not set"),
             incoming_asset: self.incoming_asset.expect("incoming_asset is not set"),
-            swap_marker_aux_incoming: self.swap_marker_aux_incoming,
-            swap_marker_aux_outgoing: self.swap_marker_aux_outgoing,
-            escrowed_asset_aux: self.escrowed_asset_aux,
-            incoming_asset_aux: self.incoming_asset_aux,
+            nifty_asset_group: self.nifty_asset_group,
+            swap_marker_ata: self.swap_marker_ata,
+            authority_ata: self.authority_ata,
             escrowed_asset_program: self
                 .escrowed_asset_program
                 .expect("escrowed_asset_program is not set"),
@@ -346,26 +320,24 @@ impl SwapBuilder {
     }
 }
 
-/// `swap` CPI accounts.
-pub struct SwapCpiAccounts<'a, 'b> {
-    /// Account to pay for any accounts that need to be created
+/// `swap_nifty_s_p_l` CPI accounts.
+pub struct SwapNiftySPLCpiAccounts<'a, 'b> {
+    /// Account to pay for ATA creation
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// Authority to transfer incoming asset
     pub authority: &'b solana_program::account_info::AccountInfo<'a>,
     /// Escrows the asset and encodes state about the swap
     pub swap_marker: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The asset to be escrowed for the swap
+    /// The currently escrowed asset
     pub escrowed_asset: &'b solana_program::account_info::AccountInfo<'a>,
-    /// External asset connected to the incoming asset
+    /// External asset being swapped for the escrowed asset
     pub incoming_asset: &'b solana_program::account_info::AccountInfo<'a>,
-    /// Auxiliary account for the swap marker: e.g. ATA
-    pub swap_marker_aux_incoming: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    /// Auxiliary account for the swap marker: e.g. ATA
-    pub swap_marker_aux_outgoing: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    /// Associated account for the incoming asset, e.g. token account
-    pub escrowed_asset_aux: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    /// Associated account for the external asset, e.g. token account
-    pub incoming_asset_aux: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    /// Group account for the nifty asset, if applicable
+    pub nifty_asset_group: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    /// ATA account for the swap marker, if applicable
+    pub swap_marker_ata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    /// ATA account for the authority, if applicable
+    pub authority_ata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// Transfer Program ID of the incoming asset
     pub escrowed_asset_program: &'b solana_program::account_info::AccountInfo<'a>,
     /// Transfer Program ID of the external asset
@@ -376,28 +348,26 @@ pub struct SwapCpiAccounts<'a, 'b> {
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
-/// `swap` CPI instruction.
-pub struct SwapCpi<'a, 'b> {
+/// `swap_nifty_s_p_l` CPI instruction.
+pub struct SwapNiftySPLCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
-    /// Account to pay for any accounts that need to be created
+    /// Account to pay for ATA creation
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// Authority to transfer incoming asset
     pub authority: &'b solana_program::account_info::AccountInfo<'a>,
     /// Escrows the asset and encodes state about the swap
     pub swap_marker: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The asset to be escrowed for the swap
+    /// The currently escrowed asset
     pub escrowed_asset: &'b solana_program::account_info::AccountInfo<'a>,
-    /// External asset connected to the incoming asset
+    /// External asset being swapped for the escrowed asset
     pub incoming_asset: &'b solana_program::account_info::AccountInfo<'a>,
-    /// Auxiliary account for the swap marker: e.g. ATA
-    pub swap_marker_aux_incoming: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    /// Auxiliary account for the swap marker: e.g. ATA
-    pub swap_marker_aux_outgoing: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    /// Associated account for the incoming asset, e.g. token account
-    pub escrowed_asset_aux: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    /// Associated account for the external asset, e.g. token account
-    pub incoming_asset_aux: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    /// Group account for the nifty asset, if applicable
+    pub nifty_asset_group: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    /// ATA account for the swap marker, if applicable
+    pub swap_marker_ata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    /// ATA account for the authority, if applicable
+    pub authority_ata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// Transfer Program ID of the incoming asset
     pub escrowed_asset_program: &'b solana_program::account_info::AccountInfo<'a>,
     /// Transfer Program ID of the external asset
@@ -408,10 +378,10 @@ pub struct SwapCpi<'a, 'b> {
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
-impl<'a, 'b> SwapCpi<'a, 'b> {
+impl<'a, 'b> SwapNiftySPLCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: SwapCpiAccounts<'a, 'b>,
+        accounts: SwapNiftySPLCpiAccounts<'a, 'b>,
     ) -> Self {
         Self {
             __program: program,
@@ -420,10 +390,9 @@ impl<'a, 'b> SwapCpi<'a, 'b> {
             swap_marker: accounts.swap_marker,
             escrowed_asset: accounts.escrowed_asset,
             incoming_asset: accounts.incoming_asset,
-            swap_marker_aux_incoming: accounts.swap_marker_aux_incoming,
-            swap_marker_aux_outgoing: accounts.swap_marker_aux_outgoing,
-            escrowed_asset_aux: accounts.escrowed_asset_aux,
-            incoming_asset_aux: accounts.incoming_asset_aux,
+            nifty_asset_group: accounts.nifty_asset_group,
+            swap_marker_ata: accounts.swap_marker_ata,
+            authority_ata: accounts.authority_ata,
             escrowed_asset_program: accounts.escrowed_asset_program,
             incoming_asset_program: accounts.incoming_asset_program,
             associated_token_program: accounts.associated_token_program,
@@ -463,7 +432,7 @@ impl<'a, 'b> SwapCpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(13 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(12 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.payer.key,
             true,
@@ -484,9 +453,9 @@ impl<'a, 'b> SwapCpi<'a, 'b> {
             *self.incoming_asset.key,
             false,
         ));
-        if let Some(swap_marker_aux_incoming) = self.swap_marker_aux_incoming {
+        if let Some(nifty_asset_group) = self.nifty_asset_group {
             accounts.push(solana_program::instruction::AccountMeta::new(
-                *swap_marker_aux_incoming.key,
+                *nifty_asset_group.key,
                 false,
             ));
         } else {
@@ -495,9 +464,9 @@ impl<'a, 'b> SwapCpi<'a, 'b> {
                 false,
             ));
         }
-        if let Some(swap_marker_aux_outgoing) = self.swap_marker_aux_outgoing {
+        if let Some(swap_marker_ata) = self.swap_marker_ata {
             accounts.push(solana_program::instruction::AccountMeta::new(
-                *swap_marker_aux_outgoing.key,
+                *swap_marker_ata.key,
                 false,
             ));
         } else {
@@ -506,20 +475,9 @@ impl<'a, 'b> SwapCpi<'a, 'b> {
                 false,
             ));
         }
-        if let Some(escrowed_asset_aux) = self.escrowed_asset_aux {
+        if let Some(authority_ata) = self.authority_ata {
             accounts.push(solana_program::instruction::AccountMeta::new(
-                *escrowed_asset_aux.key,
-                false,
-            ));
-        } else {
-            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                crate::MONOSWAP_ID,
-                false,
-            ));
-        }
-        if let Some(incoming_asset_aux) = self.incoming_asset_aux {
-            accounts.push(solana_program::instruction::AccountMeta::new(
-                *incoming_asset_aux.key,
+                *authority_ata.key,
                 false,
             ));
         } else {
@@ -558,31 +516,28 @@ impl<'a, 'b> SwapCpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let data = SwapInstructionData::new().try_to_vec().unwrap();
+        let data = SwapNiftySPLInstructionData::new().try_to_vec().unwrap();
 
         let instruction = solana_program::instruction::Instruction {
             program_id: crate::MONOSWAP_ID,
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(13 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(12 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         account_infos.push(self.payer.clone());
         account_infos.push(self.authority.clone());
         account_infos.push(self.swap_marker.clone());
         account_infos.push(self.escrowed_asset.clone());
         account_infos.push(self.incoming_asset.clone());
-        if let Some(swap_marker_aux_incoming) = self.swap_marker_aux_incoming {
-            account_infos.push(swap_marker_aux_incoming.clone());
+        if let Some(nifty_asset_group) = self.nifty_asset_group {
+            account_infos.push(nifty_asset_group.clone());
         }
-        if let Some(swap_marker_aux_outgoing) = self.swap_marker_aux_outgoing {
-            account_infos.push(swap_marker_aux_outgoing.clone());
+        if let Some(swap_marker_ata) = self.swap_marker_ata {
+            account_infos.push(swap_marker_ata.clone());
         }
-        if let Some(escrowed_asset_aux) = self.escrowed_asset_aux {
-            account_infos.push(escrowed_asset_aux.clone());
-        }
-        if let Some(incoming_asset_aux) = self.incoming_asset_aux {
-            account_infos.push(incoming_asset_aux.clone());
+        if let Some(authority_ata) = self.authority_ata {
+            account_infos.push(authority_ata.clone());
         }
         account_infos.push(self.escrowed_asset_program.clone());
         account_infos.push(self.incoming_asset_program.clone());
@@ -602,7 +557,7 @@ impl<'a, 'b> SwapCpi<'a, 'b> {
     }
 }
 
-/// Instruction builder for `Swap` via CPI.
+/// Instruction builder for `SwapNiftySPL` via CPI.
 ///
 /// ### Accounts:
 ///
@@ -611,31 +566,29 @@ impl<'a, 'b> SwapCpi<'a, 'b> {
 ///   2. `[writable]` swap_marker
 ///   3. `[writable]` escrowed_asset
 ///   4. `[writable]` incoming_asset
-///   5. `[writable, optional]` swap_marker_aux_incoming
-///   6. `[writable, optional]` swap_marker_aux_outgoing
-///   7. `[writable, optional]` escrowed_asset_aux
-///   8. `[writable, optional]` incoming_asset_aux
-///   9. `[]` escrowed_asset_program
-///   10. `[]` incoming_asset_program
-///   11. `[optional]` associated_token_program
-///   12. `[]` system_program
-pub struct SwapCpiBuilder<'a, 'b> {
-    instruction: Box<SwapCpiBuilderInstruction<'a, 'b>>,
+///   5. `[writable, optional]` nifty_asset_group
+///   6. `[writable, optional]` swap_marker_ata
+///   7. `[writable, optional]` authority_ata
+///   8. `[]` escrowed_asset_program
+///   9. `[]` incoming_asset_program
+///   10. `[optional]` associated_token_program
+///   11. `[]` system_program
+pub struct SwapNiftySPLCpiBuilder<'a, 'b> {
+    instruction: Box<SwapNiftySPLCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> SwapCpiBuilder<'a, 'b> {
+impl<'a, 'b> SwapNiftySPLCpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
-        let instruction = Box::new(SwapCpiBuilderInstruction {
+        let instruction = Box::new(SwapNiftySPLCpiBuilderInstruction {
             __program: program,
             payer: None,
             authority: None,
             swap_marker: None,
             escrowed_asset: None,
             incoming_asset: None,
-            swap_marker_aux_incoming: None,
-            swap_marker_aux_outgoing: None,
-            escrowed_asset_aux: None,
-            incoming_asset_aux: None,
+            nifty_asset_group: None,
+            swap_marker_ata: None,
+            authority_ata: None,
             escrowed_asset_program: None,
             incoming_asset_program: None,
             associated_token_program: None,
@@ -644,7 +597,7 @@ impl<'a, 'b> SwapCpiBuilder<'a, 'b> {
         });
         Self { instruction }
     }
-    /// Account to pay for any accounts that need to be created
+    /// Account to pay for ATA creation
     #[inline(always)]
     pub fn payer(&mut self, payer: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.payer = Some(payer);
@@ -668,7 +621,7 @@ impl<'a, 'b> SwapCpiBuilder<'a, 'b> {
         self.instruction.swap_marker = Some(swap_marker);
         self
     }
-    /// The asset to be escrowed for the swap
+    /// The currently escrowed asset
     #[inline(always)]
     pub fn escrowed_asset(
         &mut self,
@@ -677,7 +630,7 @@ impl<'a, 'b> SwapCpiBuilder<'a, 'b> {
         self.instruction.escrowed_asset = Some(escrowed_asset);
         self
     }
-    /// External asset connected to the incoming asset
+    /// External asset being swapped for the escrowed asset
     #[inline(always)]
     pub fn incoming_asset(
         &mut self,
@@ -687,43 +640,33 @@ impl<'a, 'b> SwapCpiBuilder<'a, 'b> {
         self
     }
     /// `[optional account]`
-    /// Auxiliary account for the swap marker: e.g. ATA
+    /// Group account for the nifty asset, if applicable
     #[inline(always)]
-    pub fn swap_marker_aux_incoming(
+    pub fn nifty_asset_group(
         &mut self,
-        swap_marker_aux_incoming: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+        nifty_asset_group: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     ) -> &mut Self {
-        self.instruction.swap_marker_aux_incoming = swap_marker_aux_incoming;
+        self.instruction.nifty_asset_group = nifty_asset_group;
         self
     }
     /// `[optional account]`
-    /// Auxiliary account for the swap marker: e.g. ATA
+    /// ATA account for the swap marker, if applicable
     #[inline(always)]
-    pub fn swap_marker_aux_outgoing(
+    pub fn swap_marker_ata(
         &mut self,
-        swap_marker_aux_outgoing: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+        swap_marker_ata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     ) -> &mut Self {
-        self.instruction.swap_marker_aux_outgoing = swap_marker_aux_outgoing;
+        self.instruction.swap_marker_ata = swap_marker_ata;
         self
     }
     /// `[optional account]`
-    /// Associated account for the incoming asset, e.g. token account
+    /// ATA account for the authority, if applicable
     #[inline(always)]
-    pub fn escrowed_asset_aux(
+    pub fn authority_ata(
         &mut self,
-        escrowed_asset_aux: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+        authority_ata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     ) -> &mut Self {
-        self.instruction.escrowed_asset_aux = escrowed_asset_aux;
-        self
-    }
-    /// `[optional account]`
-    /// Associated account for the external asset, e.g. token account
-    #[inline(always)]
-    pub fn incoming_asset_aux(
-        &mut self,
-        incoming_asset_aux: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    ) -> &mut Self {
-        self.instruction.incoming_asset_aux = incoming_asset_aux;
+        self.instruction.authority_ata = authority_ata;
         self
     }
     /// Transfer Program ID of the incoming asset
@@ -804,7 +747,7 @@ impl<'a, 'b> SwapCpiBuilder<'a, 'b> {
         &self,
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
-        let instruction = SwapCpi {
+        let instruction = SwapNiftySPLCpi {
             __program: self.instruction.__program,
 
             payer: self.instruction.payer.expect("payer is not set"),
@@ -826,13 +769,11 @@ impl<'a, 'b> SwapCpiBuilder<'a, 'b> {
                 .incoming_asset
                 .expect("incoming_asset is not set"),
 
-            swap_marker_aux_incoming: self.instruction.swap_marker_aux_incoming,
+            nifty_asset_group: self.instruction.nifty_asset_group,
 
-            swap_marker_aux_outgoing: self.instruction.swap_marker_aux_outgoing,
+            swap_marker_ata: self.instruction.swap_marker_ata,
 
-            escrowed_asset_aux: self.instruction.escrowed_asset_aux,
-
-            incoming_asset_aux: self.instruction.incoming_asset_aux,
+            authority_ata: self.instruction.authority_ata,
 
             escrowed_asset_program: self
                 .instruction
@@ -858,17 +799,16 @@ impl<'a, 'b> SwapCpiBuilder<'a, 'b> {
     }
 }
 
-struct SwapCpiBuilderInstruction<'a, 'b> {
+struct SwapNiftySPLCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     swap_marker: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     escrowed_asset: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     incoming_asset: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    swap_marker_aux_incoming: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    swap_marker_aux_outgoing: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    escrowed_asset_aux: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    incoming_asset_aux: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    nifty_asset_group: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    swap_marker_ata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    authority_ata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     escrowed_asset_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     incoming_asset_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     associated_token_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,

@@ -1,8 +1,4 @@
-use crate::{assertions::assert_program_owner, transfer::transfer_nifty};
-
 use super::*;
-
-use nifty_asset_types::state::Asset;
 
 pub fn process_swap_nifty<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
     let ctx = SwapNiftyAccounts::context(accounts)?;
@@ -39,18 +35,6 @@ pub fn process_swap_nifty<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult 
         &[bump],
     ]];
 
-    // Ensure incoming asset is a Nifty asset.
-
-    // Onwed by the Nifty asset program.
-    assert_program_owner("incoming asset", &incoming_asset_info, &nifty_asset::ID)?;
-
-    let data = incoming_asset_info.try_borrow_data().unwrap();
-
-    // Must have the expected amount of data and the correct discriminator and standard.
-    if data.len() < Asset::LEN || data[2] != NiftyStandard::NonFungible as u8 {
-        return Err(MonoswapError::InvalidNiftyAsset.into());
-    }
-
     // Transfer Nifty asset from authority signer to the swap marker.
     let transfer_params = TransferNiftyParams {
         nifty_program_info: ctx.accounts.nifty_asset_program,
@@ -61,10 +45,8 @@ pub fn process_swap_nifty<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult 
         signer_seeds: &[],
     };
 
-    drop(data); // Ensure data is dropped before invoking the CPI.
-
     msg!("Transferring Nifty asset into escrow.");
-    transfer_nifty(transfer_params)?;
+    check_and_transfer_nifty(transfer_params)?;
 
     // Transfer escrowed Nifty asset from the swap marker to the authority signer.
     let transfer_params = TransferNiftyParams {
@@ -77,7 +59,7 @@ pub fn process_swap_nifty<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult 
     };
 
     msg!("Transferring Nifty asset out of escrow.");
-    transfer_nifty(transfer_params)?;
+    check_and_transfer_nifty(transfer_params)?;
 
     // Update SwapMarker state.
     // Accounts have swapped, so update the escrowed and external assets.

@@ -52,20 +52,17 @@ pub enum MonoswapError {
     MissingNiftyGroup,
     /// 14 - Missing incoming asset aux
     #[error("Missing incoming asset aux")]
-    MissingIncomingAssetAux,
-    /// 15 - Missing external asset aux
-    #[error("Missing escrowed asset aux")]
-    MissingEscrowedAssetAux,
-    /// 16 - Missing swap marker aux
+    MissingAuthorityAta,
+    /// 15 - Missing swap marker aux
     #[error("Missing swap marker aux")]
-    MissingSwapMarkerAux,
-    /// 17 - Unsupported asset type
+    MissingSwapMarkerAta,
+    /// 16 - Unsupported asset type
     #[error("Unsupported asset type")]
     UnsupportedAssetType,
-    /// 18 - Invalid Token Program
+    /// 17 - Invalid Token Program
     #[error("Invalid Token Program")]
     InvalidTokenProgram,
-    /// 19 - Invalid Nifty Asset
+    /// 18 - Invalid Nifty Asset
     #[error("Invalid Nifty Asset")]
     InvalidNiftyAsset,
 }

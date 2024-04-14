@@ -69,7 +69,7 @@ export function getSwapSPLInstructionDataSerializer(): Serializer<
     struct<SwapSPLInstructionData>([['discriminator', u8()]], {
       description: 'SwapSPLInstructionData',
     }),
-    (value) => ({ ...value, discriminator: 2 })
+    (value) => ({ ...value, discriminator: 1 })
   ) as Serializer<SwapSPLInstructionDataArgs, SwapSPLInstructionData>;
 }
 
