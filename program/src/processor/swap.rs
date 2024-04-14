@@ -57,7 +57,7 @@ pub fn process_swap<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
             };
 
             msg!("Transferring Nifty asset into escrow.");
-            check_and_transfer_nifty(transfer_params)?;
+            transfer_nifty(transfer_params)?;
         }
         AssetType::SplToken => {
             msg!("Incoming SPL token asset detected");
@@ -104,7 +104,7 @@ pub fn process_swap<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
             };
 
             msg!("Transferring Nifty asset out of escrow.");
-            check_and_transfer_nifty(transfer_params)?;
+            transfer_nifty(transfer_params)?;
         }
         AssetType::SplToken => {
             msg!("Escrowed SPL token asset detected");

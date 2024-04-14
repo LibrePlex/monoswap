@@ -1,8 +1,10 @@
 mod create_swap;
 mod swap;
+mod swap_nifty;
 
 pub use create_swap::*;
 pub use swap::*;
+pub use swap_nifty::*;
 
 use std::cmp::{max, min};
 
@@ -10,14 +12,13 @@ pub use crate::{
     assertions::{assert_same_pubkeys, assert_signer},
     asset_detection::detect_asset,
     state::{AssetType, SwapSeeds},
-    transfer::{
-        check_and_transfer_nifty, check_and_transfer_spl, TransferNiftyParams, TransferSplParams,
-    },
+    transfer::{check_and_transfer_spl, transfer_nifty, TransferNiftyParams, TransferSplParams},
     utils::unpack,
 };
 pub use borsh::BorshDeserialize;
 pub use nifty_asset::{
     accounts::Asset as NiftyAsset, instructions::TransferCpi as NiftyTransferCpi,
+    types::Standard as NiftyStandard,
 };
 pub use solana_program::{
     account_info::AccountInfo,
@@ -35,7 +36,7 @@ pub use spl_token_2022::{
 };
 
 pub use crate::error::MonoswapError;
-pub use crate::instruction::accounts::{CreateSwapAccounts, SwapAccounts};
+pub use crate::instruction::accounts::{CreateSwapAccounts, SwapAccounts, SwapNiftyAccounts};
 pub use crate::instruction::{CreateSwapArgs, MonoswapInstruction};
 pub use crate::state::SwapMarker;
 
@@ -66,6 +67,10 @@ pub fn process_instruction<'a>(
         MonoswapInstruction::Swap => {
             msg!("Instruction: Swap");
             process_swap(accounts)
+        }
+        MonoswapInstruction::SwapNifty => {
+            msg!("Instruction: Swap Nifty");
+            process_swap_nifty(accounts)
         }
     }
 }

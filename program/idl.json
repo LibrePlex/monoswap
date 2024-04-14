@@ -228,6 +228,74 @@
         "type": "u8",
         "value": 1
       }
+    },
+    {
+      "name": "SwapNifty",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "Authority to transfer incoming asset"
+          ]
+        },
+        {
+          "name": "swapMarker",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Escrows the asset and encodes state about the swap"
+          ]
+        },
+        {
+          "name": "escrowedAsset",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The currently escrowed asset"
+          ]
+        },
+        {
+          "name": "incomingAsset",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "External asset being swapped for the escrowed asset"
+          ]
+        },
+        {
+          "name": "escrowedAssetGroup",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "Group account for the escrowed asset, if applicable"
+          ]
+        },
+        {
+          "name": "incomingAssetGroup",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "Group account for the incoming asset, if applicable"
+          ]
+        },
+        {
+          "name": "niftyAssetProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Nifty asset program account"
+          ]
+        }
+      ],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 2
+      }
     }
   ],
   "accounts": [
@@ -434,6 +502,11 @@
       "code": 18,
       "name": "InvalidTokenProgram",
       "msg": "Invalid Token Program"
+    },
+    {
+      "code": 19,
+      "name": "InvalidNiftyAsset",
+      "msg": "Invalid Nifty Asset"
     }
   ],
   "metadata": {

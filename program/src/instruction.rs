@@ -19,7 +19,6 @@ pub enum MonoswapInstruction {
     CreateSwap(CreateSwapArgs),
 
     /// Swap paired assets.
-    ///  #[account(2, writable, name="swap_marker", desc = "Escrows the asset and encodes state about the swap")]
     #[account(0, writable, signer, name="payer", desc = "Account to pay for any accounts that need to be created")]
     #[account(1, signer, name="authority", desc = "Authority to transfer incoming asset")]
     #[account(2, writable, name="swap_marker", desc = "Escrows the asset and encodes state about the swap")]
@@ -34,6 +33,16 @@ pub enum MonoswapInstruction {
     #[account(11, optional, name="associated_token_program", desc = "The SPL associated token program account program")]
     #[account(12, name="system_program", desc = "System program account")]
     Swap,
+
+    /// Swap paired nifty assets.
+    #[account(0, signer, name="authority", desc = "Authority to transfer incoming asset")]
+    #[account(1, writable, name="swap_marker", desc = "Escrows the asset and encodes state about the swap")]
+    #[account(2, writable, name="escrowed_asset", desc = "The currently escrowed asset")]
+    #[account(3, writable, name="incoming_asset", desc = "External asset being swapped for the escrowed asset")]
+    #[account(4, optional, writable, name="escrowed_asset_group", desc = "Group account for the escrowed asset, if applicable")]
+    #[account(5, optional, writable, name="incoming_asset_group", desc = "Group account for the incoming asset, if applicable")]
+    #[account(6, name="nifty_asset_program", desc = "Nifty asset program account")]
+    SwapNifty,
 }
 
 #[repr(C)]

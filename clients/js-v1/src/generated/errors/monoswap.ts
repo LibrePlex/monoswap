@@ -266,6 +266,19 @@ export class InvalidTokenProgramError extends ProgramError {
 codeToErrorMap.set(0x12, InvalidTokenProgramError);
 nameToErrorMap.set('InvalidTokenProgram', InvalidTokenProgramError);
 
+/** InvalidNiftyAsset: Invalid Nifty Asset */
+export class InvalidNiftyAssetError extends ProgramError {
+  override readonly name: string = 'InvalidNiftyAsset';
+
+  readonly code: number = 0x13; // 19
+
+  constructor(program: Program, cause?: Error) {
+    super('Invalid Nifty Asset', program, cause);
+  }
+}
+codeToErrorMap.set(0x13, InvalidNiftyAssetError);
+nameToErrorMap.set('InvalidNiftyAsset', InvalidNiftyAssetError);
+
 /**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors

@@ -1,4 +1,4 @@
-use nifty_asset::{accounts::Asset as NiftyAsset, instructions::TransferCpi as NiftyTransferCpi};
+use nifty_asset::instructions::TransferCpi as NiftyTransferCpi;
 use solana_program::{
     account_info::AccountInfo,
     entrypoint::ProgramResult,
@@ -25,7 +25,7 @@ pub struct TransferNiftyParams<'a, 'b> {
     pub signer_seeds: &'b [&'b [&'b [u8]]],
 }
 
-pub fn check_and_transfer_nifty(params: TransferNiftyParams<'_, '_>) -> ProgramResult {
+pub fn transfer_nifty(params: TransferNiftyParams<'_, '_>) -> ProgramResult {
     let TransferNiftyParams {
         nifty_program_info,
         signer_info,
@@ -35,31 +35,31 @@ pub fn check_and_transfer_nifty(params: TransferNiftyParams<'_, '_>) -> ProgramR
         signer_seeds,
     } = params;
 
-    // The incoming asset program is actually the Nifty program.
-    assert_same_pubkeys(
-        "incoming_asset_program",
-        nifty_program_info,
-        &nifty_asset::ID,
-    )?;
+    // // The incoming asset program is actually the Nifty program.
+    // assert_same_pubkeys(
+    //     "incoming_asset_program",
+    //     nifty_program_info,
+    //     &nifty_asset::ID,
+    // )?;
 
-    // Decode the Nifty asset.
-    let asset = NiftyAsset::from_bytes(&asset_info.try_borrow_data()?)?;
+    // // Decode the Nifty asset.
+    // let asset = NiftyAsset::from_bytes(&asset_info.try_borrow_data()?)?;
 
-    // If a group is present on the asset, the group asset account must be the aux account.a
-    let group_asset_info_opt = if let Some(group_pub) = asset.group.to_option() {
-        if group_asset_opt_info.is_none() {
-            msg!("Nifty group asset is missing");
-            return Err(MonoswapError::MissingNiftyGroup.into());
-        }
+    // // If a group is present on the asset, the group asset account must be the aux account.a
+    // let group_asset_info_opt = if let Some(group_pub) = asset.group.to_option() {
+    //     if group_asset_opt_info.is_none() {
+    //         msg!("Nifty group asset is missing");
+    //         return Err(MonoswapError::MissingNiftyGroup.into());
+    //     }
 
-        // We need a group so get it and make sure it matches the group stored on the Nifty account.
-        let group_asset_info = group_asset_opt_info.unwrap();
-        assert_same_pubkeys("nifty group asset", group_asset_info, &group_pub)?;
+    //     // We need a group so get it and make sure it matches the group stored on the Nifty account.
+    //     let group_asset_info = group_asset_opt_info.unwrap();
+    //     assert_same_pubkeys("nifty group asset", group_asset_info, &group_pub)?;
 
-        Some(group_asset_info)
-    } else {
-        None
-    };
+    //     Some(group_asset_info)
+    // } else {
+    //     None
+    // };
 
     // Transfer Nifty asset from authority signer to the swap marker.
     NiftyTransferCpi {
@@ -67,7 +67,7 @@ pub fn check_and_transfer_nifty(params: TransferNiftyParams<'_, '_>) -> ProgramR
         asset: asset_info,
         signer: signer_info,
         recipient: recipient_info,
-        group: group_asset_info_opt,
+        group: group_asset_opt_info,
     }
     .invoke_signed(signer_seeds)?;
     Ok(())

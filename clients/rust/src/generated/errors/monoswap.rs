@@ -67,6 +67,9 @@ pub enum MonoswapError {
     /// 18 (0x12) - Invalid Token Program
     #[error("Invalid Token Program")]
     InvalidTokenProgram,
+    /// 19 (0x13) - Invalid Nifty Asset
+    #[error("Invalid Nifty Asset")]
+    InvalidNiftyAsset,
 }
 
 impl solana_program::program_error::PrintProgramError for MonoswapError {

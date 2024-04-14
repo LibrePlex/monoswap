@@ -65,6 +65,9 @@ pub enum MonoswapError {
     /// 18 - Invalid Token Program
     #[error("Invalid Token Program")]
     InvalidTokenProgram,
+    /// 19 - Invalid Nifty Asset
+    #[error("Invalid Nifty Asset")]
+    InvalidNiftyAsset,
 }
 
 impl PrintProgramError for MonoswapError {

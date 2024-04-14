@@ -8,3 +8,4 @@
 
 export * from './createSwap';
 export * from './swap';
+export * from './swapNifty';

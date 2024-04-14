@@ -63,7 +63,7 @@ pub fn process_create_swap<'a>(
                 signer_seeds: &[],
             };
 
-            check_and_transfer_nifty(transfer_params)?;
+            transfer_nifty(transfer_params)?;
         }
         AssetType::SplToken => {
             msg!("SPL mint detected");
