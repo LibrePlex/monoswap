@@ -34,6 +34,22 @@ pub enum MonoswapInstruction {
     #[account(12, name="system_program", desc = "System program account")]
     Swap,
 
+    /// Swap paired fungible assets.
+    #[account(0, writable, signer, name="payer", desc = "Account to pay for ATA creation")]
+    #[account(1, signer, name="authority", desc = "Authority to transfer incoming asset")]
+    #[account(2, writable, name="swap_marker", desc = "Escrows the asset and encodes state about the swap")]
+    #[account(3, writable, name="escrowed_asset", desc = "The currently escrowed asset")]
+    #[account(4, writable, name="incoming_asset", desc = "External asset being swapped for the escrowed asset")]
+    #[account(5, writable, name="swap_marker_escrowed_ata", desc = "The ATA for the escrowed asset and Swap Marker")]
+    #[account(6, writable, name="swap_marker_incoming_ata", desc = "The ATA for the incoming asset and Swap Marker")]
+    #[account(7, writable, name="outgoing_asset_ata", desc = "ATA for the escrowed asset and authority")]
+    #[account(8, writable, name="incoming_asset_ata", desc = "ATA for the incoming asset and authority")]
+    #[account(9, name="escrowed_asset_program", desc = "Transfer Program ID of the incoming asset")]
+    #[account(10, name="incoming_asset_program", desc = "Transfer Program ID of the external asset")]
+    #[account(11, optional, name="associated_token_program", desc = "The SPL associated token program account program")]
+    #[account(12, name="system_program", desc = "System program account")]
+    SwapSPL,
+
     /// Swap paired nifty assets.
     #[account(0, signer, name="authority", desc = "Authority to transfer incoming asset")]
     #[account(1, writable, name="swap_marker", desc = "Escrows the asset and encodes state about the swap")]

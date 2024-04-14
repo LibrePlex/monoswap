@@ -98,17 +98,20 @@ pub fn check_and_transfer_spl(params: TransferSplParams<'_, '_>) -> ProgramResul
         signer_seeds,
     } = params;
 
+    msg!("decoding mint");
     let mint = unpack::<Mint>(&mint_info.try_borrow_data()?)?;
+    msg!("decoding source_ata");
     let source_ata = unpack::<TokenAccount>(&source_ata_info.try_borrow_data()?)?;
 
     // Checks.
-    // The incoming asset program is actually one of the SPL token programs.
+    // The incoming asset program is actually one of the SPL ken programs.
     if !TOKEN_PROGRAM_IDS.contains(spl_program_info.key) {
         msg!("Incoming asset program is not a valid SPL token program");
         return Err(MonoswapError::InvalidTokenProgram.into());
     }
 
     // Create destination ata, if necessary.
+    msg!("checking destination ATA");
     if destination_ata_info.data_is_empty() {
         msg!("Creating destination ATA");
         // creating the associated token account
@@ -129,6 +132,7 @@ pub fn check_and_transfer_spl(params: TransferSplParams<'_, '_>) -> ProgramResul
     }
 
     // ATA belongs to the mint.
+    msg!("ata must belong to the mint");
     assert_same_pubkeys("mint", mint_info, &source_ata.mint)?;
 
     let account_infos = &[

@@ -6,13 +6,13 @@ import {
 } from '@metaplex-foundation/umi';
 import test from 'ava';
 import { ASSET_PROGRAM_ID, create, fetchAsset } from '@nifty-oss/asset';
-// import {
-//   SPL_TOKEN_PROGRAM_ID,
-//   createMintWithAssociatedToken,
-//   SPL_ASSOCIATED_TOKEN_PROGRAM_ID,
-//   findAssociatedTokenPda,
-//   fetchToken,
-// } from '@metaplex-foundation/mpl-toolbox';
+import {
+  SPL_TOKEN_PROGRAM_ID,
+  createMintWithAssociatedToken,
+  SPL_ASSOCIATED_TOKEN_PROGRAM_ID,
+  findAssociatedTokenPda,
+  fetchToken,
+} from '@metaplex-foundation/mpl-toolbox';
 import { createUmi } from './_setup';
 import {
   SwapMarker,
@@ -20,6 +20,7 @@ import {
   fetchSwapMarker,
   findSwapMarkerPda,
   swapNifty,
+  swapSPL,
 } from '../src';
 
 test('it can swap nifty-to-nifty and back', async (t) => {
@@ -107,6 +108,15 @@ test('it can swap nifty-to-nifty and back', async (t) => {
   assetAccount = await fetchAsset(umi, asset2.publicKey);
   t.is(assetAccount.owner, user.publicKey);
 
+  // Swap Marker state is as expected
+  t.like(await fetchSwapMarker(umi, swapMarker), <SwapMarker>{
+    namespace: authority.publicKey,
+    escrowedAsset: asset1.publicKey,
+    externalAsset: asset2.publicKey,
+    escrowedAmount: BigInt(1),
+    externalAmount: BigInt(1),
+  });
+
   // Swap back.
   await swapNifty(umi, {
     authority: user,
@@ -122,6 +132,201 @@ test('it can swap nifty-to-nifty and back', async (t) => {
 
   assetAccount = await fetchAsset(umi, asset1.publicKey);
   t.is(assetAccount.owner, user.publicKey);
+
+  // Swap Marker state is as expected
+  t.like(await fetchSwapMarker(umi, swapMarker), <SwapMarker>{
+    namespace: authority.publicKey,
+    escrowedAsset: asset2.publicKey,
+    externalAsset: asset1.publicKey,
+    escrowedAmount: BigInt(1),
+    externalAmount: BigInt(1),
+  });
+});
+
+test('it swap fungible-to-fungible and back', async (t) => {
+  // Create a swap where one set of fungibles are escrowed and entangled with
+  // external Fungible tokens owned by a different user.
+
+  const umi = await createUmi();
+
+  // Creator of the fungible to be escrowed and authority creating the swap
+  const authority = generateSigner(umi);
+  // Fungible to be escrowed
+  const mint1 = generateSigner(umi);
+
+  // Owner of the external fungible
+  const user = generateSigner(umi);
+  // Fungible to be entangled
+  const mint2 = generateSigner(umi);
+
+  // Create a fungible token and mint some to the authority.
+  const mint1Amount = 100;
+  const mint2Amount = 10;
+  const decimals = 9;
+
+  // Create mints.
+  await createMintWithAssociatedToken(umi, {
+    amount: mint1Amount,
+    decimals,
+    mint: mint1,
+    mintAuthority: authority,
+    owner: authority.publicKey,
+  }).sendAndConfirm(umi);
+
+  await createMintWithAssociatedToken(umi, {
+    amount: mint2Amount,
+    decimals,
+    mint: mint2,
+    mintAuthority: user,
+    owner: user.publicKey,
+  }).sendAndConfirm(umi);
+
+  // Create the swap.
+  const swapMarker = findSwapMarkerPda(umi, {
+    namespace: authority.publicKey,
+    asset1: mint1.publicKey,
+    asset2: mint2.publicKey,
+  });
+
+  const swapMarkerMint1Ata = findAssociatedTokenPda(umi, {
+    mint: mint1.publicKey,
+    owner: toPublicKey(swapMarker),
+    tokenProgramId: SPL_TOKEN_PROGRAM_ID,
+  });
+
+  // Swap marker ata now for Mint2
+  const swapMarkerMint2Ata = findAssociatedTokenPda(umi, {
+    mint: mint2.publicKey,
+    owner: toPublicKey(swapMarker),
+    tokenProgramId: SPL_TOKEN_PROGRAM_ID,
+  });
+
+  const authorityMint1Ata = findAssociatedTokenPda(umi, {
+    mint: mint1.publicKey,
+    owner: authority.publicKey,
+    tokenProgramId: SPL_TOKEN_PROGRAM_ID,
+  });
+
+  const userMint1Ata = findAssociatedTokenPda(umi, {
+    mint: mint1.publicKey,
+    owner: user.publicKey,
+    tokenProgramId: SPL_TOKEN_PROGRAM_ID,
+  });
+
+  const userMint2Ata = findAssociatedTokenPda(umi, {
+    mint: mint2.publicKey,
+    owner: user.publicKey,
+    tokenProgramId: SPL_TOKEN_PROGRAM_ID,
+  });
+
+  await createSwap(umi, {
+    payer: umi.identity,
+    namespace: authority,
+    authority,
+    swapMarker,
+    swapMarkerAux: swapMarkerMint1Ata, // We transfer to this.
+    incomingAsset: mint1.publicKey,
+    incomingAssetAux: authorityMint1Ata,
+    externalAsset: mint2.publicKey,
+    incomingAssetProgram: SPL_TOKEN_PROGRAM_ID,
+    associatedTokenProgram: SPL_ASSOCIATED_TOKEN_PROGRAM_ID,
+    incomingAmount: mint1Amount,
+    externalAmount: mint2Amount,
+  }).sendAndConfirm(umi);
+
+  // Then the swap was created with the correct data.
+  t.like(await fetchSwapMarker(umi, swapMarker), <SwapMarker>{
+    namespace: authority.publicKey,
+    escrowedAsset: mint1.publicKey,
+    externalAsset: mint2.publicKey,
+    escrowedAmount: BigInt(mint1Amount),
+    externalAmount: BigInt(mint2Amount),
+  });
+
+  // The incoming asset is now escrowed in the swap.
+  const swapMarkerAtaAccount = await fetchToken(umi, swapMarkerMint1Ata);
+  t.is(swapMarkerAtaAccount.owner, toPublicKey(swapMarker));
+  t.is(swapMarkerAtaAccount.amount, BigInt(mint1Amount));
+
+  const userAtaAccount = await fetchToken(umi, userMint2Ata);
+  t.is(userAtaAccount.amount, BigInt(mint2Amount));
+
+  /* Swap the fungibles.
+
+ The swap requires four ATAs:
+
+ incomingAssetAta:           [authority, incoming asset]
+ outgoingAssetAta            [authority, escrowed asset]
+ swapMarkerIncomingAta:      [swap marker, incoming asset]
+ swapMarkerEscrowedAssetAta: [swap marker, escrowed asset]
+
+ The transfer:
+ Incoming asset:
+ incomingAssetAta --> swapMarkerIncomingAta
+
+ Escrowed/outgoing asset:
+ swapMarkerEscrowedAssetAta --> outgoingAssetAta
+*/
+
+  await swapSPL(umi, {
+    payer: umi.identity,
+    authority: user,
+    swapMarker,
+    swapMarkerEscrowedAta: swapMarkerMint1Ata,
+    swapMarkerIncomingAta: swapMarkerMint2Ata,
+    escrowedAsset: mint1.publicKey,
+    incomingAsset: mint2.publicKey,
+    outgoingAssetAta: userMint1Ata,
+    incomingAssetAta: userMint2Ata,
+    escrowedAssetProgram: SPL_TOKEN_PROGRAM_ID,
+    incomingAssetProgram: SPL_TOKEN_PROGRAM_ID,
+    associatedTokenProgram: SPL_ASSOCIATED_TOKEN_PROGRAM_ID,
+  }).sendAndConfirm(umi);
+
+  // Mint 2 tokens are now now escrowed on the swap.
+  const swapMarkerMint2AtaAccount = await fetchToken(umi, swapMarkerMint2Ata);
+  t.is(swapMarkerMint2AtaAccount.owner, toPublicKey(swapMarker));
+  t.is(swapMarkerMint2AtaAccount.amount, BigInt(mint2Amount));
+
+  // Mint 1 tokens are owned by the user.
+  const userMint1AtaAccount = await fetchToken(umi, userMint1Ata);
+  t.is(userMint1AtaAccount.owner, toPublicKey(user.publicKey));
+  t.is(userMint1AtaAccount.amount, BigInt(mint1Amount));
+
+  // Swap Marker state is as expected
+  t.like(await fetchSwapMarker(umi, swapMarker), <SwapMarker>{
+    namespace: authority.publicKey,
+    escrowedAsset: mint2.publicKey,
+    externalAsset: mint1.publicKey,
+    escrowedAmount: BigInt(mint2Amount),
+    externalAmount: BigInt(mint1Amount),
+  });
+
+  // Swap back.
+  // await swapSPL(umi, {
+  //   payer: umi.identity,
+  //   authority: user,
+  //   swapMarker,
+  //   swapMarkerEscrowedAta: swapMarkerMint2Ata,
+  //   swapMarkerIncomingAta: swapMarkerMint1Ata,
+  //   escrowedAsset: mint2.publicKey,
+  //   incomingAsset: mint1.publicKey,
+  //   outgoingAssetAta: userMint2Ata,
+  //   incomingAssetAta: userMint1Ata,
+  //   escrowedAssetProgram: SPL_TOKEN_PROGRAM_ID,
+  //   incomingAssetProgram: SPL_TOKEN_PROGRAM_ID,
+  //   associatedTokenProgram: SPL_ASSOCIATED_TOKEN_PROGRAM_ID,
+  // }).sendAndConfirm(umi);
+
+  // // Mint 1 tokens are now now escrowed on the swap again.
+  // const swapMarkerMint1AtaAccount = await fetchToken(umi, swapMarkerMint1Ata);
+  // t.is(swapMarkerMint1AtaAccount.owner, toPublicKey(swapMarker));
+  // t.is(swapMarkerMint1AtaAccount.amount, BigInt(mint1Amount));
+
+  // // Mint 2 tokens are owned by the user.
+  // const userMint2AtaAccount = await fetchToken(umi, userMint2Ata);
+  // t.is(userMint2AtaAccount.owner, toPublicKey(user.publicKey));
+  // t.is(userMint2AtaAccount.amount, BigInt(mint2Amount));
 });
 
 // test('it can swap nifty-to-fungible and back', async (t) => {
@@ -270,124 +475,4 @@ test('it can swap nifty-to-nifty and back', async (t) => {
 //   // The Nifty asset is owned by the user again.
 //   assetAccount = await fetchAsset(umi, asset.publicKey);
 //   t.is(assetAccount.owner, user.publicKey);
-// });
-
-// test('it swap fungible-to-fungible and back', async (t) => {
-//   // Create a swap where one set of fungibles are escrowed and entangled with
-//   // external Fungible tokens owned by a different user.
-
-//   const umi = await createUmi();
-
-//   // Creator of the fungible to be escrowed and authority creating the swap
-//   const authority = generateSigner(umi);
-//   // Fungible to be escrowed
-//   const mint1 = generateSigner(umi);
-
-//   // Owner of the external fungible
-//   const user = generateSigner(umi);
-//   // Fungible to be entangled
-//   const mint2 = generateSigner(umi);
-
-//   // Create a fungible token and mint some to the authority.
-//   const incomingAmount = 100;
-//   const externalAmount = 10;
-//   const decimals = 9;
-
-//   // Create mints.
-//   await createMintWithAssociatedToken(umi, {
-//     amount: incomingAmount,
-//     decimals,
-//     mint: mint1,
-//     mintAuthority: authority,
-//     owner: authority.publicKey,
-//   }).sendAndConfirm(umi);
-
-//   await createMintWithAssociatedToken(umi, {
-//     amount: externalAmount,
-//     decimals,
-//     mint: mint2,
-//     mintAuthority: user,
-//     owner: user.publicKey,
-//   }).sendAndConfirm(umi);
-
-//   // Create the swap.
-//   const swapMarker = findSwapMarkerPda(umi, {
-//     namespace: authority.publicKey,
-//     asset1: mint1.publicKey,
-//     asset2: mint2.publicKey,
-//   });
-
-//   const swapMarkerMint1Ata = findAssociatedTokenPda(umi, {
-//     mint: mint1.publicKey,
-//     owner: toPublicKey(swapMarker),
-//     tokenProgramId: SPL_TOKEN_PROGRAM_ID,
-//   });
-
-//   const sourceAta = findAssociatedTokenPda(umi, {
-//     mint: mint1.publicKey,
-//     owner: authority.publicKey,
-//     tokenProgramId: SPL_TOKEN_PROGRAM_ID,
-//   });
-
-//   await createSwap(umi, {
-//     payer: umi.identity,
-//     namespace: authority,
-//     authority,
-//     swapMarker,
-//     swapMarkerAux: swapMarkerMint1Ata, // We transfer to this.
-//     incomingAsset: mint1.publicKey,
-//     incomingAssetAux: sourceAta,
-//     externalAsset: mint2.publicKey,
-//     incomingAssetProgram: SPL_TOKEN_PROGRAM_ID,
-//     associatedTokenProgram: SPL_ASSOCIATED_TOKEN_PROGRAM_ID,
-//     incomingAmount,
-//     externalAmount,
-//   }).sendAndConfirm(umi);
-
-//   // Then the swap was created with the correct data.
-//   t.like(await fetchSwapMarker(umi, swapMarker), <SwapMarker>{
-//     namespace: authority.publicKey,
-//     escrowedAsset: mint1.publicKey,
-//     externalAsset: mint2.publicKey,
-//     escrowedAmount: BigInt(incomingAmount),
-//     externalAmount: BigInt(externalAmount),
-//   });
-
-//   // The incoming asset is now escrowed in the swap.
-//   const swapMarkerAtaAccount = await fetchToken(umi, swapMarkerMint1Ata);
-//   t.is(swapMarkerAtaAccount.owner, toPublicKey(swapMarker));
-//   t.is(swapMarkerAtaAccount.amount, BigInt(incomingAmount));
-
-//   // The external fungible tokens are still owned by the user.
-//   const userMint2Ata = findAssociatedTokenPda(umi, {
-//     mint: mint2.publicKey,
-//     owner: user.publicKey,
-//     tokenProgramId: SPL_TOKEN_PROGRAM_ID,
-//   });
-
-//   const userAtaAccount = await fetchToken(umi, userMint2Ata);
-//   t.is(userAtaAccount.amount, BigInt(externalAmount));
-
-//   // Swap the fungibles.
-
-//   // Swap marker ata now for Mint2
-//   const swapMarkerMint2Ata = findAssociatedTokenPda(umi, {
-//     mint: mint2.publicKey,
-//     owner: toPublicKey(swapMarker),
-//     tokenProgramId: SPL_TOKEN_PROGRAM_ID,
-//   });
-
-//   await swap(umi, {
-//     payer: umi.identity,
-//     authority: user,
-//     swapMarker,
-//     swapMarkerAux: swapMarkerMint2Ata, // New escrow ATA--transfer mint2 *to* this
-//     incomingAsset: mint2.publicKey,
-//     incomingAssetAux: userMint2Ata, // Transfer *from* this
-//     escrowedAsset: mint1.publicKey,
-//     escrowedAssetAux: swapMarkerMint1Ata, // Current escrow ATA: transfer mint1 *from* this
-//     incomingAssetProgram: SPL_TOKEN_PROGRAM_ID,
-//     escrowedAssetProgram: SPL_TOKEN_PROGRAM_ID,
-//     associatedTokenProgram: SPL_ASSOCIATED_TOKEN_PROGRAM_ID,
-//   }).sendAndConfirm(umi);
 // });

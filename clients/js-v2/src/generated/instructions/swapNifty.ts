@@ -78,7 +78,7 @@ export type SwapNiftyInstructionDataArgs = {};
 export function getSwapNiftyInstructionDataEncoder(): Encoder<SwapNiftyInstructionDataArgs> {
   return mapEncoder(
     getStructEncoder([['discriminator', getU8Encoder()]]),
-    (value) => ({ ...value, discriminator: 2 })
+    (value) => ({ ...value, discriminator: 3 })
   );
 }
 

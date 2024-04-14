@@ -230,6 +230,121 @@
       }
     },
     {
+      "name": "SwapSPL",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "Account to pay for ATA creation"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "Authority to transfer incoming asset"
+          ]
+        },
+        {
+          "name": "swapMarker",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Escrows the asset and encodes state about the swap"
+          ]
+        },
+        {
+          "name": "escrowedAsset",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The currently escrowed asset"
+          ]
+        },
+        {
+          "name": "incomingAsset",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "External asset being swapped for the escrowed asset"
+          ]
+        },
+        {
+          "name": "swapMarkerEscrowedAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The ATA for the escrowed asset and Swap Marker"
+          ]
+        },
+        {
+          "name": "swapMarkerIncomingAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The ATA for the incoming asset and Swap Marker"
+          ]
+        },
+        {
+          "name": "outgoingAssetAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "ATA for the escrowed asset and authority"
+          ]
+        },
+        {
+          "name": "incomingAssetAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "ATA for the incoming asset and authority"
+          ]
+        },
+        {
+          "name": "escrowedAssetProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Transfer Program ID of the incoming asset"
+          ]
+        },
+        {
+          "name": "incomingAssetProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Transfer Program ID of the external asset"
+          ]
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The SPL associated token program account program"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "System program account"
+          ]
+        }
+      ],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 2
+      }
+    },
+    {
       "name": "SwapNifty",
       "accounts": [
         {
@@ -294,7 +409,7 @@
       "args": [],
       "discriminant": {
         "type": "u8",
-        "value": 2
+        "value": 3
       }
     }
   ],

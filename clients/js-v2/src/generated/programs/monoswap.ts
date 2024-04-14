@@ -18,6 +18,7 @@ import {
   ParsedCreateSwapInstruction,
   ParsedSwapInstruction,
   ParsedSwapNiftyInstruction,
+  ParsedSwapSPLInstruction,
 } from '../instructions';
 import { memcmp } from '../shared';
 
@@ -46,6 +47,7 @@ export enum MonoswapAccount {
 export enum MonoswapInstruction {
   CreateSwap,
   Swap,
+  SwapSPL,
   SwapNifty,
 }
 
@@ -61,6 +63,9 @@ export function identifyMonoswapInstruction(
     return MonoswapInstruction.Swap;
   }
   if (memcmp(data, getU8Encoder().encode(2), 0)) {
+    return MonoswapInstruction.SwapSPL;
+  }
+  if (memcmp(data, getU8Encoder().encode(3), 0)) {
     return MonoswapInstruction.SwapNifty;
   }
   throw new Error(
@@ -77,6 +82,9 @@ export type ParsedMonoswapInstruction<
   | ({
       instructionType: MonoswapInstruction.Swap;
     } & ParsedSwapInstruction<TProgram>)
+  | ({
+      instructionType: MonoswapInstruction.SwapSPL;
+    } & ParsedSwapSPLInstruction<TProgram>)
   | ({
       instructionType: MonoswapInstruction.SwapNifty;
     } & ParsedSwapNiftyInstruction<TProgram>);

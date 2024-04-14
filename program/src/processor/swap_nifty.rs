@@ -91,5 +91,5 @@ pub fn process_swap_nifty<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult 
         &mut swap_marker.external_amount,
     );
 
-    Ok(())
+    swap_marker.save(ctx.accounts.swap_marker)
 }
