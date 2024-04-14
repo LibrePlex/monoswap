@@ -40,7 +40,7 @@ pub fn process_swap_nifty_spl<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramRes
     let incoming_asset_type = detect_asset(ctx.accounts.incoming_asset)?;
 
     match incoming_asset_type {
-        AssetType::Nifty => {
+        AssetType::NiftyAsset => {
             msg!("Incoming Nifty asset detected");
 
             // Transfer Nifty asset from authority signer to the swap marker.

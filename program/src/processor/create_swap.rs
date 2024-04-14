@@ -50,7 +50,7 @@ pub fn process_create_swap<'a>(
     let incoming_asset_type = detect_asset(ctx.accounts.incoming_asset)?;
 
     match incoming_asset_type {
-        AssetType::Nifty => {
+        AssetType::NiftyAsset => {
             msg!("Nifty asset detected");
 
             // Transfer Nifty asset from authority signer to the swap marker.

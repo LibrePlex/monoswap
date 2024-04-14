@@ -1,8 +1,6 @@
-use mpl_token_metadata::accounts::MasterEdition;
 use nifty_asset_types::state::{Asset, Standard as NiftyStandard};
 use solana_program::{
-    account_info::AccountInfo, msg, program_error::ProgramError, program_option::COption,
-    program_pack::Pack,
+    account_info::AccountInfo, msg, program_error::ProgramError, program_pack::Pack,
 };
 use spl_token_2022::state::Mint;
 
@@ -20,7 +18,7 @@ pub fn detect_asset(asset_info: &AccountInfo) -> Result<AssetType, ProgramError>
 
             // Must have the expected amount of data and the correct discriminator and standard.
             if data.len() >= Asset::LEN && data[2] == NiftyStandard::NonFungible as u8 {
-                AssetType::Nifty
+                AssetType::NiftyAsset
             }
             // Invalid account.
             else {
@@ -36,17 +34,6 @@ pub fn detect_asset(asset_info: &AccountInfo) -> Result<AssetType, ProgramError>
                 return Err(MonoswapError::IninitalizedMint.into());
             }
 
-            // Check if it's a MPLX asset.
-            let mplx_freeze_auth = MasterEdition::find_pda(asset_info.key).0;
-
-            if let COption::Some(freeze_auth) = mint.freeze_authority {
-                if freeze_auth == mplx_freeze_auth {
-                    msg!("MPLX asset detected");
-                    return Ok(AssetType::MplxLegacy);
-                }
-            }
-
-            // Not a Metaplex legacy asset, so some type of SPL token.
             AssetType::SplToken
         }
         // Unknown program, so unsupported asset type.

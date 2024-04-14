@@ -88,8 +88,8 @@ impl SwapMarker {
 #[derive(Clone, BorshSerialize, BorshDeserialize, Debug)]
 pub enum AssetType {
     Invalid,
-    Nifty,
+    NiftyAsset,
     SplToken,
-    MplxLegacy,
+    MplxpNFT,
     MplxCore,
 }
