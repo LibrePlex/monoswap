@@ -36,8 +36,8 @@ jobs:
 
       - name: Run tests
         shell: bash
-        working-directory: scripts/client
-        run: RUST_LOG=error npx zx test-js.mjs
+        working-directory: "."
+        run: RUST_LOG=error npx zx ./scripts/client/test-js.mjs
 
   lint:
     name: Lint
