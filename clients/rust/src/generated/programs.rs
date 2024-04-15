@@ -8,4 +8,4 @@
 use solana_program::{pubkey, pubkey::Pubkey};
 
 /// `monoswap` program ID.
-pub const MONOSWAP_ID: Pubkey = pubkey!("F7CfUwFLRk4J1wbzknbYff7ywhT6r871FCSwTHRWfr1G");
+pub const MONOSWAP_ID: Pubkey = pubkey!("MonoRPwMWxcsVEJV27jyEt1f5VoWg3szDBRYUenm221");

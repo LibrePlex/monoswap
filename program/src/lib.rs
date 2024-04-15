@@ -10,7 +10,7 @@ pub mod utils;
 
 pub use solana_program;
 
-solana_program::declare_id!("F7CfUwFLRk4J1wbzknbYff7ywhT6r871FCSwTHRWfr1G");
+solana_program::declare_id!("MonoRPwMWxcsVEJV27jyEt1f5VoWg3szDBRYUenm221");
 
 // Variable naming convention:
 //
