@@ -14,7 +14,8 @@
     "validator:restart": "pnpm validator:start --restart",
     "validator:stop": "zx ./scripts/stop-validator.mjs",
     "clients:js:test": "zx ./scripts/client/test-js.mjs",
-    "clients:rust:test": "zx ./scripts/client/test-rust.mjs"
+    "clients:rust:test": "zx ./scripts/client/test-rust.mjs",
+    "deploy:devnet": "solana program deploy -k ~/.config/solana/libreplex-deployer.json --program-id ./target/deploy/libreplex_monoswap-keypair.json -u https://api.devnet.solana.com ./target/deploy/libreplex_monoswap.so"
   },
   "devDependencies": {
     "@iarna/toml": "^2.2.5",
