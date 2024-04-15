@@ -81,7 +81,7 @@ export function swapSPL(
   // Program ID.
   const programId = context.programs.getPublicKey(
     'monoswap',
-    'MonoRPwMWxcsVEJV27jyEt1f5VoWg3szDBRYUenm221'
+    'MonojHG3jNB5W9TC8mZm49aJbRXxjsnPzgVWj9j9hu5'
   );
 
   // Accounts.

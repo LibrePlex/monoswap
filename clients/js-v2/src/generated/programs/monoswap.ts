@@ -23,10 +23,10 @@ import {
 import { memcmp } from '../shared';
 
 export const MONOSWAP_PROGRAM_ADDRESS =
-  'MonoRPwMWxcsVEJV27jyEt1f5VoWg3szDBRYUenm221' as Address<'MonoRPwMWxcsVEJV27jyEt1f5VoWg3szDBRYUenm221'>;
+  'MonojHG3jNB5W9TC8mZm49aJbRXxjsnPzgVWj9j9hu5' as Address<'MonojHG3jNB5W9TC8mZm49aJbRXxjsnPzgVWj9j9hu5'>;
 
 export type MonoswapProgram =
-  Program<'MonoRPwMWxcsVEJV27jyEt1f5VoWg3szDBRYUenm221'> &
+  Program<'MonojHG3jNB5W9TC8mZm49aJbRXxjsnPzgVWj9j9hu5'> &
     ProgramWithErrors<MonoswapProgramErrorCode, MonoswapProgramError>;
 
 export function getMonoswapProgram(): MonoswapProgram {
@@ -74,7 +74,7 @@ export function identifyMonoswapInstruction(
 }
 
 export type ParsedMonoswapInstruction<
-  TProgram extends string = 'MonoRPwMWxcsVEJV27jyEt1f5VoWg3szDBRYUenm221',
+  TProgram extends string = 'MonojHG3jNB5W9TC8mZm49aJbRXxjsnPzgVWj9j9hu5',
 > =
   | ({
       instructionType: MonoswapInstruction.CreateSwap;

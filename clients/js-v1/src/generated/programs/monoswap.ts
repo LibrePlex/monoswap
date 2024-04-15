@@ -15,7 +15,7 @@ import {
 import { getMonoswapErrorFromCode, getMonoswapErrorFromName } from '../errors';
 
 export const MONOSWAP_PROGRAM_ID =
-  'MonoRPwMWxcsVEJV27jyEt1f5VoWg3szDBRYUenm221' as PublicKey<'MonoRPwMWxcsVEJV27jyEt1f5VoWg3szDBRYUenm221'>;
+  'MonojHG3jNB5W9TC8mZm49aJbRXxjsnPzgVWj9j9hu5' as PublicKey<'MonojHG3jNB5W9TC8mZm49aJbRXxjsnPzgVWj9j9hu5'>;
 
 export function createMonoswapProgram(): Program {
   return {

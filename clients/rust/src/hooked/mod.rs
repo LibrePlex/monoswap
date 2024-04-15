@@ -18,13 +18,12 @@ impl SwapMarker {
         let asset1_bytes = asset1.to_bytes();
         let asset2_bytes = asset2.to_bytes();
 
-        
         Pubkey::find_program_address(
             &[
                 b"swap_marker",
                 &namespace.to_bytes(),
                 &min(asset1_bytes, asset2_bytes),
-                &max(asset1_bytes, asset2_bytes)
+                &max(asset1_bytes, asset2_bytes),
             ],
             &crate::ID,
         )
