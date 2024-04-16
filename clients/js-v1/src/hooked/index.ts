@@ -17,7 +17,7 @@ export function findSwapMarkerPda(
 ): Pda {
   const programId = context.programs.getPublicKey(
     'monoswap',
-    'F7CfUwFLRk4J1wbzknbYff7ywhT6r871FCSwTHRWfr1G'
+    'MonojHG3jNB5W9TC8mZm49aJbRXxjsnPzgVWj9j9hu5'
   );
 
   // Compare the first byte of asset1 and asset2 and find the smaller one to
