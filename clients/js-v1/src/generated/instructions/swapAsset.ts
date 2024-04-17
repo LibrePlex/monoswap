@@ -27,7 +27,7 @@ import {
 } from '../shared';
 
 // Accounts.
-export type SwapNiftyInstructionAccounts = {
+export type SwapAssetInstructionAccounts = {
   /** Authority to transfer incoming asset */
   authority?: Signer;
   /** Escrows the asset and encodes state about the swap */
@@ -40,35 +40,35 @@ export type SwapNiftyInstructionAccounts = {
   escrowedAssetGroup?: PublicKey | Pda;
   /** Group account for the incoming asset, if applicable */
   incomingAssetGroup?: PublicKey | Pda;
-  /** Nifty asset program account */
-  niftyAssetProgram: PublicKey | Pda;
+  /** Asset program account */
+  assetProgram: PublicKey | Pda;
 };
 
 // Data.
-export type SwapNiftyInstructionData = { discriminator: number };
+export type SwapAssetInstructionData = { discriminator: number };
 
-export type SwapNiftyInstructionDataArgs = {};
+export type SwapAssetInstructionDataArgs = {};
 
-export function getSwapNiftyInstructionDataSerializer(): Serializer<
-  SwapNiftyInstructionDataArgs,
-  SwapNiftyInstructionData
+export function getSwapAssetInstructionDataSerializer(): Serializer<
+  SwapAssetInstructionDataArgs,
+  SwapAssetInstructionData
 > {
   return mapSerializer<
-    SwapNiftyInstructionDataArgs,
+    SwapAssetInstructionDataArgs,
     any,
-    SwapNiftyInstructionData
+    SwapAssetInstructionData
   >(
-    struct<SwapNiftyInstructionData>([['discriminator', u8()]], {
-      description: 'SwapNiftyInstructionData',
+    struct<SwapAssetInstructionData>([['discriminator', u8()]], {
+      description: 'SwapAssetInstructionData',
     }),
     (value) => ({ ...value, discriminator: 2 })
-  ) as Serializer<SwapNiftyInstructionDataArgs, SwapNiftyInstructionData>;
+  ) as Serializer<SwapAssetInstructionDataArgs, SwapAssetInstructionData>;
 }
 
 // Instruction.
-export function swapNifty(
+export function swapAsset(
   context: Pick<Context, 'identity' | 'programs'>,
-  input: SwapNiftyInstructionAccounts
+  input: SwapAssetInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
@@ -108,10 +108,10 @@ export function swapNifty(
       isWritable: true as boolean,
       value: input.incomingAssetGroup ?? null,
     },
-    niftyAssetProgram: {
+    assetProgram: {
       index: 6,
       isWritable: false as boolean,
-      value: input.niftyAssetProgram ?? null,
+      value: input.assetProgram ?? null,
     },
   } satisfies ResolvedAccountsWithIndices;
 
@@ -133,7 +133,7 @@ export function swapNifty(
   );
 
   // Data.
-  const data = getSwapNiftyInstructionDataSerializer().serialize({});
+  const data = getSwapAssetInstructionDataSerializer().serialize({});
 
   // Bytes Created On Chain.
   const bytesCreatedOnChain = 0;

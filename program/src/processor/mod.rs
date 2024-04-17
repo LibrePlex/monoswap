@@ -1,11 +1,11 @@
 mod create_swap;
-mod swap_nifty;
-mod swap_nifty_spl;
+mod swap_asset;
+mod swap_asset_spl;
 mod swap_spl;
 
 pub use create_swap::*;
-pub use swap_nifty::*;
-pub use swap_nifty_spl::*;
+pub use swap_asset::*;
+pub use swap_asset_spl::*;
 pub use swap_spl::*;
 
 use std::cmp::{max, min};
@@ -41,7 +41,7 @@ pub use spl_token_2022::{
 
 pub use crate::error::MonoswapError;
 pub use crate::instruction::accounts::{
-    CreateSwapAccounts, SwapNiftyAccounts, SwapNiftySPLAccounts, SwapSPLAccounts,
+    CreateSwapAccounts, SwapAssetAccounts, SwapAssetSPLAccounts, SwapSPLAccounts,
 };
 pub use crate::instruction::{CreateSwapArgs, MonoswapInstruction};
 pub use crate::state::SwapMarker;
@@ -70,16 +70,16 @@ pub fn process_instruction<'a>(
             msg!("Instruction: Create Swap");
             process_create_swap(accounts, args)
         }
-        MonoswapInstruction::SwapNifty => {
-            msg!("Instruction: Swap Nifty");
-            process_swap_nifty(accounts)
+        MonoswapInstruction::SwapAsset => {
+            msg!("Instruction: Swap Asset");
+            process_swap_asset(accounts)
         }
         MonoswapInstruction::SwapSPL => {
             msg!("Instruction: Swap SPL");
             process_swap_spl(accounts)
         }
-        MonoswapInstruction::SwapNiftySPL => {
-            msg!("Instruction: Swap Nifty SPL");
+        MonoswapInstruction::SwapAssetSPL => {
+            msg!("Instruction: Swap Asset SPL");
             process_swap_nifty_spl(accounts)
         }
     }

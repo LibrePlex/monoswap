@@ -16,8 +16,8 @@ import {
 } from '../errors';
 import {
   ParsedCreateSwapInstruction,
-  ParsedSwapNiftyInstruction,
-  ParsedSwapNiftySPLInstruction,
+  ParsedSwapAssetInstruction,
+  ParsedSwapAssetSPLInstruction,
   ParsedSwapSPLInstruction,
 } from '../instructions';
 import { memcmp } from '../shared';
@@ -47,8 +47,8 @@ export enum MonoswapAccount {
 export enum MonoswapInstruction {
   CreateSwap,
   SwapSPL,
-  SwapNifty,
-  SwapNiftySPL,
+  SwapAsset,
+  SwapAssetSPL,
 }
 
 export function identifyMonoswapInstruction(
@@ -63,10 +63,10 @@ export function identifyMonoswapInstruction(
     return MonoswapInstruction.SwapSPL;
   }
   if (memcmp(data, getU8Encoder().encode(2), 0)) {
-    return MonoswapInstruction.SwapNifty;
+    return MonoswapInstruction.SwapAsset;
   }
   if (memcmp(data, getU8Encoder().encode(3), 0)) {
-    return MonoswapInstruction.SwapNiftySPL;
+    return MonoswapInstruction.SwapAssetSPL;
   }
   throw new Error(
     'The provided instruction could not be identified as a monoswap instruction.'
@@ -83,8 +83,8 @@ export type ParsedMonoswapInstruction<
       instructionType: MonoswapInstruction.SwapSPL;
     } & ParsedSwapSPLInstruction<TProgram>)
   | ({
-      instructionType: MonoswapInstruction.SwapNifty;
-    } & ParsedSwapNiftyInstruction<TProgram>)
+      instructionType: MonoswapInstruction.SwapAsset;
+    } & ParsedSwapAssetInstruction<TProgram>)
   | ({
-      instructionType: MonoswapInstruction.SwapNiftySPL;
-    } & ParsedSwapNiftySPLInstruction<TProgram>);
+      instructionType: MonoswapInstruction.SwapAssetSPL;
+    } & ParsedSwapAssetSPLInstruction<TProgram>);

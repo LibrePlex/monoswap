@@ -32,14 +32,14 @@ import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import { MONOSWAP_PROGRAM_ADDRESS } from '../programs';
 import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
-export type SwapNiftySPLInstruction<
+export type SwapAssetSPLInstruction<
   TProgram extends string = typeof MONOSWAP_PROGRAM_ADDRESS,
   TAccountPayer extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
   TAccountSwapMarker extends string | IAccountMeta<string> = string,
   TAccountEscrowedAsset extends string | IAccountMeta<string> = string,
   TAccountIncomingAsset extends string | IAccountMeta<string> = string,
-  TAccountNiftyAssetGroup extends string | IAccountMeta<string> = string,
+  TAccountAssetGroup extends string | IAccountMeta<string> = string,
   TAccountSwapMarkerAta extends string | IAccountMeta<string> = string,
   TAccountAuthorityAta extends string | IAccountMeta<string> = string,
   TAccountEscrowedAssetProgram extends string | IAccountMeta<string> = string,
@@ -70,9 +70,9 @@ export type SwapNiftySPLInstruction<
       TAccountIncomingAsset extends string
         ? WritableAccount<TAccountIncomingAsset>
         : TAccountIncomingAsset,
-      TAccountNiftyAssetGroup extends string
-        ? WritableAccount<TAccountNiftyAssetGroup>
-        : TAccountNiftyAssetGroup,
+      TAccountAssetGroup extends string
+        ? WritableAccount<TAccountAssetGroup>
+        : TAccountAssetGroup,
       TAccountSwapMarkerAta extends string
         ? WritableAccount<TAccountSwapMarkerAta>
         : TAccountSwapMarkerAta,
@@ -95,38 +95,38 @@ export type SwapNiftySPLInstruction<
     ]
   >;
 
-export type SwapNiftySPLInstructionData = { discriminator: number };
+export type SwapAssetSPLInstructionData = { discriminator: number };
 
-export type SwapNiftySPLInstructionDataArgs = {};
+export type SwapAssetSPLInstructionDataArgs = {};
 
-export function getSwapNiftySPLInstructionDataEncoder(): Encoder<SwapNiftySPLInstructionDataArgs> {
+export function getSwapAssetSPLInstructionDataEncoder(): Encoder<SwapAssetSPLInstructionDataArgs> {
   return mapEncoder(
     getStructEncoder([['discriminator', getU8Encoder()]]),
     (value) => ({ ...value, discriminator: 3 })
   );
 }
 
-export function getSwapNiftySPLInstructionDataDecoder(): Decoder<SwapNiftySPLInstructionData> {
+export function getSwapAssetSPLInstructionDataDecoder(): Decoder<SwapAssetSPLInstructionData> {
   return getStructDecoder([['discriminator', getU8Decoder()]]);
 }
 
-export function getSwapNiftySPLInstructionDataCodec(): Codec<
-  SwapNiftySPLInstructionDataArgs,
-  SwapNiftySPLInstructionData
+export function getSwapAssetSPLInstructionDataCodec(): Codec<
+  SwapAssetSPLInstructionDataArgs,
+  SwapAssetSPLInstructionData
 > {
   return combineCodec(
-    getSwapNiftySPLInstructionDataEncoder(),
-    getSwapNiftySPLInstructionDataDecoder()
+    getSwapAssetSPLInstructionDataEncoder(),
+    getSwapAssetSPLInstructionDataDecoder()
   );
 }
 
-export type SwapNiftySPLInput<
+export type SwapAssetSPLInput<
   TAccountPayer extends string = string,
   TAccountAuthority extends string = string,
   TAccountSwapMarker extends string = string,
   TAccountEscrowedAsset extends string = string,
   TAccountIncomingAsset extends string = string,
-  TAccountNiftyAssetGroup extends string = string,
+  TAccountAssetGroup extends string = string,
   TAccountSwapMarkerAta extends string = string,
   TAccountAuthorityAta extends string = string,
   TAccountEscrowedAssetProgram extends string = string,
@@ -145,7 +145,7 @@ export type SwapNiftySPLInput<
   /** External asset being swapped for the escrowed asset */
   incomingAsset: Address<TAccountIncomingAsset>;
   /** Group account for the nifty asset, if applicable */
-  niftyAssetGroup?: Address<TAccountNiftyAssetGroup>;
+  assetGroup?: Address<TAccountAssetGroup>;
   /** ATA account for the swap marker, if applicable */
   swapMarkerAta: Address<TAccountSwapMarkerAta>;
   /** ATA account for the authority, if applicable */
@@ -160,13 +160,13 @@ export type SwapNiftySPLInput<
   systemProgram?: Address<TAccountSystemProgram>;
 };
 
-export function getSwapNiftySPLInstruction<
+export function getSwapAssetSPLInstruction<
   TAccountPayer extends string,
   TAccountAuthority extends string,
   TAccountSwapMarker extends string,
   TAccountEscrowedAsset extends string,
   TAccountIncomingAsset extends string,
-  TAccountNiftyAssetGroup extends string,
+  TAccountAssetGroup extends string,
   TAccountSwapMarkerAta extends string,
   TAccountAuthorityAta extends string,
   TAccountEscrowedAssetProgram extends string,
@@ -174,13 +174,13 @@ export function getSwapNiftySPLInstruction<
   TAccountAssociatedTokenProgram extends string,
   TAccountSystemProgram extends string,
 >(
-  input: SwapNiftySPLInput<
+  input: SwapAssetSPLInput<
     TAccountPayer,
     TAccountAuthority,
     TAccountSwapMarker,
     TAccountEscrowedAsset,
     TAccountIncomingAsset,
-    TAccountNiftyAssetGroup,
+    TAccountAssetGroup,
     TAccountSwapMarkerAta,
     TAccountAuthorityAta,
     TAccountEscrowedAssetProgram,
@@ -188,14 +188,14 @@ export function getSwapNiftySPLInstruction<
     TAccountAssociatedTokenProgram,
     TAccountSystemProgram
   >
-): SwapNiftySPLInstruction<
+): SwapAssetSPLInstruction<
   typeof MONOSWAP_PROGRAM_ADDRESS,
   TAccountPayer,
   TAccountAuthority,
   TAccountSwapMarker,
   TAccountEscrowedAsset,
   TAccountIncomingAsset,
-  TAccountNiftyAssetGroup,
+  TAccountAssetGroup,
   TAccountSwapMarkerAta,
   TAccountAuthorityAta,
   TAccountEscrowedAssetProgram,
@@ -213,7 +213,7 @@ export function getSwapNiftySPLInstruction<
     swapMarker: { value: input.swapMarker ?? null, isWritable: true },
     escrowedAsset: { value: input.escrowedAsset ?? null, isWritable: true },
     incomingAsset: { value: input.incomingAsset ?? null, isWritable: true },
-    niftyAssetGroup: { value: input.niftyAssetGroup ?? null, isWritable: true },
+    assetGroup: { value: input.assetGroup ?? null, isWritable: true },
     swapMarkerAta: { value: input.swapMarkerAta ?? null, isWritable: true },
     authorityAta: { value: input.authorityAta ?? null, isWritable: true },
     escrowedAssetProgram: {
@@ -249,7 +249,7 @@ export function getSwapNiftySPLInstruction<
       getAccountMeta(accounts.swapMarker),
       getAccountMeta(accounts.escrowedAsset),
       getAccountMeta(accounts.incomingAsset),
-      getAccountMeta(accounts.niftyAssetGroup),
+      getAccountMeta(accounts.assetGroup),
       getAccountMeta(accounts.swapMarkerAta),
       getAccountMeta(accounts.authorityAta),
       getAccountMeta(accounts.escrowedAssetProgram),
@@ -258,15 +258,15 @@ export function getSwapNiftySPLInstruction<
       getAccountMeta(accounts.systemProgram),
     ],
     programAddress,
-    data: getSwapNiftySPLInstructionDataEncoder().encode({}),
-  } as SwapNiftySPLInstruction<
+    data: getSwapAssetSPLInstructionDataEncoder().encode({}),
+  } as SwapAssetSPLInstruction<
     typeof MONOSWAP_PROGRAM_ADDRESS,
     TAccountPayer,
     TAccountAuthority,
     TAccountSwapMarker,
     TAccountEscrowedAsset,
     TAccountIncomingAsset,
-    TAccountNiftyAssetGroup,
+    TAccountAssetGroup,
     TAccountSwapMarkerAta,
     TAccountAuthorityAta,
     TAccountEscrowedAssetProgram,
@@ -278,7 +278,7 @@ export function getSwapNiftySPLInstruction<
   return instruction;
 }
 
-export type ParsedSwapNiftySPLInstruction<
+export type ParsedSwapAssetSPLInstruction<
   TProgram extends string = typeof MONOSWAP_PROGRAM_ADDRESS,
   TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
@@ -295,7 +295,7 @@ export type ParsedSwapNiftySPLInstruction<
     /** External asset being swapped for the escrowed asset */
     incomingAsset: TAccountMetas[4];
     /** Group account for the nifty asset, if applicable */
-    niftyAssetGroup?: TAccountMetas[5] | undefined;
+    assetGroup?: TAccountMetas[5] | undefined;
     /** ATA account for the swap marker, if applicable */
     swapMarkerAta: TAccountMetas[6];
     /** ATA account for the authority, if applicable */
@@ -309,17 +309,17 @@ export type ParsedSwapNiftySPLInstruction<
     /** System program account */
     systemProgram: TAccountMetas[11];
   };
-  data: SwapNiftySPLInstructionData;
+  data: SwapAssetSPLInstructionData;
 };
 
-export function parseSwapNiftySPLInstruction<
+export function parseSwapAssetSPLInstruction<
   TProgram extends string,
   TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &
     IInstructionWithData<Uint8Array>
-): ParsedSwapNiftySPLInstruction<TProgram, TAccountMetas> {
+): ParsedSwapAssetSPLInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 12) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
@@ -344,7 +344,7 @@ export function parseSwapNiftySPLInstruction<
       swapMarker: getNextAccount(),
       escrowedAsset: getNextAccount(),
       incomingAsset: getNextAccount(),
-      niftyAssetGroup: getNextOptionalAccount(),
+      assetGroup: getNextOptionalAccount(),
       swapMarkerAta: getNextAccount(),
       authorityAta: getNextAccount(),
       escrowedAssetProgram: getNextAccount(),
@@ -352,6 +352,6 @@ export function parseSwapNiftySPLInstruction<
       associatedTokenProgram: getNextOptionalAccount(),
       systemProgram: getNextAccount(),
     },
-    data: getSwapNiftySPLInstructionDataDecoder().decode(instruction.data),
+    data: getSwapAssetSPLInstructionDataDecoder().decode(instruction.data),
   };
 }

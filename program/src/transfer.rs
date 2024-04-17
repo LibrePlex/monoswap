@@ -28,6 +28,28 @@ pub struct TransferNiftyParams<'a, 'b> {
     pub signer_seeds: &'b [&'b [&'b [u8]]],
 }
 
+pub fn transfer_nifty(params: TransferNiftyParams<'_, '_>) -> ProgramResult {
+    let TransferNiftyParams {
+        nifty_program_info,
+        signer_info,
+        asset_info,
+        recipient_info,
+        group_asset_opt_info,
+        signer_seeds,
+    } = params;
+
+    // Transfer Nifty asset from authority signer to the swap marker.
+    NiftyTransferCpi {
+        __program: nifty_program_info,
+        asset: asset_info,
+        signer: signer_info,
+        recipient: recipient_info,
+        group: group_asset_opt_info,
+    }
+    .invoke_signed(signer_seeds)?;
+    Ok(())
+}
+
 pub fn check_and_transfer_nifty(params: TransferNiftyParams<'_, '_>) -> ProgramResult {
     let TransferNiftyParams {
         nifty_program_info,

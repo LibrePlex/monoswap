@@ -29,8 +29,8 @@ import {
   createSwap,
   fetchSwapMarker,
   findSwapMarkerPda,
-  swapNifty,
-  swapNiftySPL,
+  swapAsset,
+  swapAssetSPL,
   swapSPL,
 } from '../src';
 
@@ -105,12 +105,12 @@ test('it can swap nifty-to-nifty and back', async (t) => {
   t.is(assetAccount.owner, user.publicKey);
 
   // Swap them.
-  await swapNifty(umi, {
+  await swapAsset(umi, {
     authority: user,
     swapMarker,
     incomingAsset: asset1.publicKey,
     escrowedAsset: asset2.publicKey,
-    niftyAssetProgram: ASSET_PROGRAM_ID,
+    assetProgram: ASSET_PROGRAM_ID,
   }).sendAndConfirm(umi);
 
   // Assets are reversed.
@@ -131,12 +131,12 @@ test('it can swap nifty-to-nifty and back', async (t) => {
   });
 
   // Swap back.
-  await swapNifty(umi, {
+  await swapAsset(umi, {
     authority: user,
     swapMarker,
     incomingAsset: asset2.publicKey,
     escrowedAsset: asset1.publicKey,
-    niftyAssetProgram: ASSET_PROGRAM_ID,
+    assetProgram: ASSET_PROGRAM_ID,
   }).sendAndConfirm(umi);
 
   // Back to the original state.
@@ -455,7 +455,7 @@ test('it can swap nifty-to-fungible and back', async (t) => {
 
   // Swap the fungibles back to the user in exchange for the Nifty asset.
 
-  await swapNiftySPL(umi, {
+  await swapAssetSPL(umi, {
     payer: umi.identity,
     authority: user,
     swapMarker,
@@ -486,7 +486,7 @@ test('it can swap nifty-to-fungible and back', async (t) => {
   });
 
   // Swap back.
-  await swapNiftySPL(umi, {
+  await swapAssetSPL(umi, {
     payer: umi.identity,
     authority: user,
     swapMarker,
@@ -618,7 +618,7 @@ test('it can swap nifty-to-mplx-legacy and back', async (t) => {
 
   // Swap the fungibles back to the user in exchange for the Nifty asset.
 
-  await swapNiftySPL(umi, {
+  await swapAssetSPL(umi, {
     payer: umi.identity,
     authority: user,
     swapMarker,
@@ -649,7 +649,7 @@ test('it can swap nifty-to-mplx-legacy and back', async (t) => {
   });
 
   // Swap back.
-  await swapNiftySPL(umi, {
+  await swapAssetSPL(umi, {
     payer: umi.identity,
     authority: user,
     swapMarker,

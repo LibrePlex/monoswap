@@ -27,7 +27,7 @@ import {
 } from '../shared';
 
 // Accounts.
-export type SwapNiftySPLInstructionAccounts = {
+export type SwapAssetSPLInstructionAccounts = {
   /** Account to pay for ATA creation */
   payer?: Signer;
   /** Authority to transfer incoming asset */
@@ -39,7 +39,7 @@ export type SwapNiftySPLInstructionAccounts = {
   /** External asset being swapped for the escrowed asset */
   incomingAsset: PublicKey | Pda;
   /** Group account for the nifty asset, if applicable */
-  niftyAssetGroup?: PublicKey | Pda;
+  assetGroup?: PublicKey | Pda;
   /** ATA account for the swap marker, if applicable */
   swapMarkerAta: PublicKey | Pda;
   /** ATA account for the authority, if applicable */
@@ -55,30 +55,30 @@ export type SwapNiftySPLInstructionAccounts = {
 };
 
 // Data.
-export type SwapNiftySPLInstructionData = { discriminator: number };
+export type SwapAssetSPLInstructionData = { discriminator: number };
 
-export type SwapNiftySPLInstructionDataArgs = {};
+export type SwapAssetSPLInstructionDataArgs = {};
 
-export function getSwapNiftySPLInstructionDataSerializer(): Serializer<
-  SwapNiftySPLInstructionDataArgs,
-  SwapNiftySPLInstructionData
+export function getSwapAssetSPLInstructionDataSerializer(): Serializer<
+  SwapAssetSPLInstructionDataArgs,
+  SwapAssetSPLInstructionData
 > {
   return mapSerializer<
-    SwapNiftySPLInstructionDataArgs,
+    SwapAssetSPLInstructionDataArgs,
     any,
-    SwapNiftySPLInstructionData
+    SwapAssetSPLInstructionData
   >(
-    struct<SwapNiftySPLInstructionData>([['discriminator', u8()]], {
-      description: 'SwapNiftySPLInstructionData',
+    struct<SwapAssetSPLInstructionData>([['discriminator', u8()]], {
+      description: 'SwapAssetSPLInstructionData',
     }),
     (value) => ({ ...value, discriminator: 3 })
-  ) as Serializer<SwapNiftySPLInstructionDataArgs, SwapNiftySPLInstructionData>;
+  ) as Serializer<SwapAssetSPLInstructionDataArgs, SwapAssetSPLInstructionData>;
 }
 
 // Instruction.
-export function swapNiftySPL(
+export function swapAssetSPL(
   context: Pick<Context, 'identity' | 'payer' | 'programs'>,
-  input: SwapNiftySPLInstructionAccounts
+  input: SwapAssetSPLInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
@@ -113,10 +113,10 @@ export function swapNiftySPL(
       isWritable: true as boolean,
       value: input.incomingAsset ?? null,
     },
-    niftyAssetGroup: {
+    assetGroup: {
       index: 5,
       isWritable: true as boolean,
-      value: input.niftyAssetGroup ?? null,
+      value: input.assetGroup ?? null,
     },
     swapMarkerAta: {
       index: 6,
@@ -178,7 +178,7 @@ export function swapNiftySPL(
   );
 
   // Data.
-  const data = getSwapNiftySPLInstructionDataSerializer().serialize({});
+  const data = getSwapAssetSPLInstructionDataSerializer().serialize({});
 
   // Bytes Created On Chain.
   const bytesCreatedOnChain = 0;

@@ -235,7 +235,7 @@
       }
     },
     {
-      "name": "SwapNifty",
+      "name": "SwapAsset",
       "accounts": [
         {
           "name": "authority",
@@ -288,11 +288,11 @@
           ]
         },
         {
-          "name": "niftyAssetProgram",
+          "name": "assetProgram",
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "Nifty asset program account"
+            "Asset program account"
           ]
         }
       ],
@@ -303,7 +303,7 @@
       }
     },
     {
-      "name": "SwapNiftySPL",
+      "name": "SwapAssetSPL",
       "accounts": [
         {
           "name": "payer",
@@ -346,7 +346,7 @@
           ]
         },
         {
-          "name": "niftyAssetGroup",
+          "name": "assetGroup",
           "isMut": true,
           "isSigner": false,
           "isOptional": true,
@@ -615,6 +615,11 @@
       "code": 18,
       "name": "InvalidNiftyAsset",
       "msg": "Invalid Nifty Asset"
+    },
+    {
+      "code": 19,
+      "name": "InvalidSigner",
+      "msg": "Invalid Signer"
     }
   ],
   "metadata": {

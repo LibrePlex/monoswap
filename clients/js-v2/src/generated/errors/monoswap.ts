@@ -45,6 +45,8 @@ export const enum MonoswapProgramErrorCode {
   INVALID_TOKEN_PROGRAM = 0x11, // 17
   /** InvalidNiftyAsset: Invalid Nifty Asset */
   INVALID_NIFTY_ASSET = 0x12, // 18
+  /** InvalidSigner: Invalid Signer */
+  INVALID_SIGNER = 0x13, // 19
 }
 
 export class MonoswapProgramError extends Error {
@@ -146,6 +148,10 @@ if (__DEV__) {
     [MonoswapProgramErrorCode.INVALID_NIFTY_ASSET]: [
       'InvalidNiftyAsset',
       `Invalid Nifty Asset`,
+    ],
+    [MonoswapProgramErrorCode.INVALID_SIGNER]: [
+      'InvalidSigner',
+      `Invalid Signer`,
     ],
   };
 }
