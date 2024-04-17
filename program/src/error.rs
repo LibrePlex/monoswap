@@ -65,6 +65,9 @@ pub enum MonoswapError {
     /// 18 - Invalid Nifty Asset
     #[error("Invalid Nifty Asset")]
     InvalidNiftyAsset,
+    /// 19 - Invalid Signer
+    #[error("Invalid Signer")]
+    InvalidSigner,
 }
 
 impl PrintProgramError for MonoswapError {

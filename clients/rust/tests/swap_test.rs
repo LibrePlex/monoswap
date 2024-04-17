@@ -3,7 +3,7 @@
 use borsh::BorshDeserialize;
 use libreplex_monoswap_client::{
     accounts::{SwapMarker, SwapSeeds},
-    instructions::{CreateSwapBuilder, SwapNiftySPLBuilder},
+    instructions::{CreateSwapBuilder, SwapAssetSPLBuilder},
 };
 use nifty_asset::accounts::Asset;
 use solana_program_test::tokio;
@@ -129,13 +129,13 @@ async fn create() {
     assert_eq!(asset_data.owner, user);
 
     // Swap Nifty asset for fungibles.
-    let ix = SwapNiftySPLBuilder::new()
+    let ix = SwapAssetSPLBuilder::new()
         .payer(context.payer.pubkey())
         .authority(user) // User has the authority to transfer the incoming nifty asset
         .swap_marker(swap_marker)
         .swap_marker_ata(swap_marker_ata) // ATA where fungibles are escrowed
         .incoming_asset(asset) // Nifty asset incoming
-        .nifty_asset_group(None) // No Nifty group
+        .asset_group(None) // No Nifty group
         .escrowed_asset(mint) // Escrowed fungibles mint
         .authority_ata(user_ata) // Escrowed mint ata owned by the user
         .incoming_asset_program(nifty_asset::ID) // Nifty program needed to transfer the asset

@@ -266,6 +266,19 @@ export class InvalidNiftyAssetError extends ProgramError {
 codeToErrorMap.set(0x12, InvalidNiftyAssetError);
 nameToErrorMap.set('InvalidNiftyAsset', InvalidNiftyAssetError);
 
+/** InvalidSigner: Invalid Signer */
+export class InvalidSignerError extends ProgramError {
+  override readonly name: string = 'InvalidSigner';
+
+  readonly code: number = 0x13; // 19
+
+  constructor(program: Program, cause?: Error) {
+    super('Invalid Signer', program, cause);
+  }
+}
+codeToErrorMap.set(0x13, InvalidSignerError);
+nameToErrorMap.set('InvalidSigner', InvalidSignerError);
+
 /**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors

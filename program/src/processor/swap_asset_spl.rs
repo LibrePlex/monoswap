@@ -1,7 +1,7 @@
 use super::*;
 
 pub fn process_swap_nifty_spl<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
-    let ctx = SwapNiftySPLAccounts::context(accounts)?;
+    let ctx = SwapAssetSPLAccounts::context(accounts)?;
 
     let mut swap_marker = SwapMarker::load(ctx.accounts.swap_marker)?;
 
@@ -49,7 +49,7 @@ pub fn process_swap_nifty_spl<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramRes
                 asset_info: ctx.accounts.incoming_asset,
                 signer_info: ctx.accounts.authority,
                 recipient_info: ctx.accounts.swap_marker,
-                group_asset_opt_info: ctx.accounts.nifty_asset_group,
+                group_asset_opt_info: ctx.accounts.asset_group,
                 signer_seeds: &[],
             };
 
@@ -97,7 +97,7 @@ pub fn process_swap_nifty_spl<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramRes
                 asset_info: ctx.accounts.escrowed_asset,
                 signer_info: ctx.accounts.swap_marker,
                 recipient_info: ctx.accounts.authority,
-                group_asset_opt_info: ctx.accounts.nifty_asset_group,
+                group_asset_opt_info: ctx.accounts.asset_group,
                 signer_seeds,
             };
 

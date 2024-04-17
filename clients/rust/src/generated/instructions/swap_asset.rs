@@ -9,7 +9,7 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
 /// Accounts.
-pub struct SwapNifty {
+pub struct SwapAsset {
     /// Authority to transfer incoming asset
     pub authority: solana_program::pubkey::Pubkey,
     /// Escrows the asset and encodes state about the swap
@@ -22,11 +22,11 @@ pub struct SwapNifty {
     pub escrowed_asset_group: Option<solana_program::pubkey::Pubkey>,
     /// Group account for the incoming asset, if applicable
     pub incoming_asset_group: Option<solana_program::pubkey::Pubkey>,
-    /// Nifty asset program account
-    pub nifty_asset_program: solana_program::pubkey::Pubkey,
+    /// Asset program account
+    pub asset_program: solana_program::pubkey::Pubkey,
 }
 
-impl SwapNifty {
+impl SwapAsset {
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
         self.instruction_with_remaining_accounts(&[])
     }
@@ -75,11 +75,11 @@ impl SwapNifty {
             ));
         }
         accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-            self.nifty_asset_program,
+            self.asset_program,
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
-        let data = SwapNiftyInstructionData::new().try_to_vec().unwrap();
+        let data = SwapAssetInstructionData::new().try_to_vec().unwrap();
 
         solana_program::instruction::Instruction {
             program_id: crate::MONOSWAP_ID,
@@ -90,17 +90,17 @@ impl SwapNifty {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct SwapNiftyInstructionData {
+struct SwapAssetInstructionData {
     discriminator: u8,
 }
 
-impl SwapNiftyInstructionData {
+impl SwapAssetInstructionData {
     fn new() -> Self {
         Self { discriminator: 2 }
     }
 }
 
-/// Instruction builder for `SwapNifty`.
+/// Instruction builder for `SwapAsset`.
 ///
 /// ### Accounts:
 ///
@@ -110,20 +110,20 @@ impl SwapNiftyInstructionData {
 ///   3. `[writable]` incoming_asset
 ///   4. `[writable, optional]` escrowed_asset_group
 ///   5. `[writable, optional]` incoming_asset_group
-///   6. `[]` nifty_asset_program
+///   6. `[]` asset_program
 #[derive(Default)]
-pub struct SwapNiftyBuilder {
+pub struct SwapAssetBuilder {
     authority: Option<solana_program::pubkey::Pubkey>,
     swap_marker: Option<solana_program::pubkey::Pubkey>,
     escrowed_asset: Option<solana_program::pubkey::Pubkey>,
     incoming_asset: Option<solana_program::pubkey::Pubkey>,
     escrowed_asset_group: Option<solana_program::pubkey::Pubkey>,
     incoming_asset_group: Option<solana_program::pubkey::Pubkey>,
-    nifty_asset_program: Option<solana_program::pubkey::Pubkey>,
+    asset_program: Option<solana_program::pubkey::Pubkey>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
-impl SwapNiftyBuilder {
+impl SwapAssetBuilder {
     pub fn new() -> Self {
         Self::default()
     }
@@ -171,13 +171,10 @@ impl SwapNiftyBuilder {
         self.incoming_asset_group = incoming_asset_group;
         self
     }
-    /// Nifty asset program account
+    /// Asset program account
     #[inline(always)]
-    pub fn nifty_asset_program(
-        &mut self,
-        nifty_asset_program: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
-        self.nifty_asset_program = Some(nifty_asset_program);
+    pub fn asset_program(&mut self, asset_program: solana_program::pubkey::Pubkey) -> &mut Self {
+        self.asset_program = Some(asset_program);
         self
     }
     /// Add an aditional account to the instruction.
@@ -200,24 +197,22 @@ impl SwapNiftyBuilder {
     }
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
-        let accounts = SwapNifty {
+        let accounts = SwapAsset {
             authority: self.authority.expect("authority is not set"),
             swap_marker: self.swap_marker.expect("swap_marker is not set"),
             escrowed_asset: self.escrowed_asset.expect("escrowed_asset is not set"),
             incoming_asset: self.incoming_asset.expect("incoming_asset is not set"),
             escrowed_asset_group: self.escrowed_asset_group,
             incoming_asset_group: self.incoming_asset_group,
-            nifty_asset_program: self
-                .nifty_asset_program
-                .expect("nifty_asset_program is not set"),
+            asset_program: self.asset_program.expect("asset_program is not set"),
         };
 
         accounts.instruction_with_remaining_accounts(&self.__remaining_accounts)
     }
 }
 
-/// `swap_nifty` CPI accounts.
-pub struct SwapNiftyCpiAccounts<'a, 'b> {
+/// `swap_asset` CPI accounts.
+pub struct SwapAssetCpiAccounts<'a, 'b> {
     /// Authority to transfer incoming asset
     pub authority: &'b solana_program::account_info::AccountInfo<'a>,
     /// Escrows the asset and encodes state about the swap
@@ -230,12 +225,12 @@ pub struct SwapNiftyCpiAccounts<'a, 'b> {
     pub escrowed_asset_group: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// Group account for the incoming asset, if applicable
     pub incoming_asset_group: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    /// Nifty asset program account
-    pub nifty_asset_program: &'b solana_program::account_info::AccountInfo<'a>,
+    /// Asset program account
+    pub asset_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
-/// `swap_nifty` CPI instruction.
-pub struct SwapNiftyCpi<'a, 'b> {
+/// `swap_asset` CPI instruction.
+pub struct SwapAssetCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
     /// Authority to transfer incoming asset
@@ -250,14 +245,14 @@ pub struct SwapNiftyCpi<'a, 'b> {
     pub escrowed_asset_group: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// Group account for the incoming asset, if applicable
     pub incoming_asset_group: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    /// Nifty asset program account
-    pub nifty_asset_program: &'b solana_program::account_info::AccountInfo<'a>,
+    /// Asset program account
+    pub asset_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
-impl<'a, 'b> SwapNiftyCpi<'a, 'b> {
+impl<'a, 'b> SwapAssetCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: SwapNiftyCpiAccounts<'a, 'b>,
+        accounts: SwapAssetCpiAccounts<'a, 'b>,
     ) -> Self {
         Self {
             __program: program,
@@ -267,7 +262,7 @@ impl<'a, 'b> SwapNiftyCpi<'a, 'b> {
             incoming_asset: accounts.incoming_asset,
             escrowed_asset_group: accounts.escrowed_asset_group,
             incoming_asset_group: accounts.incoming_asset_group,
-            nifty_asset_program: accounts.nifty_asset_program,
+            asset_program: accounts.asset_program,
         }
     }
     #[inline(always)]
@@ -343,7 +338,7 @@ impl<'a, 'b> SwapNiftyCpi<'a, 'b> {
             ));
         }
         accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-            *self.nifty_asset_program.key,
+            *self.asset_program.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
@@ -353,7 +348,7 @@ impl<'a, 'b> SwapNiftyCpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let data = SwapNiftyInstructionData::new().try_to_vec().unwrap();
+        let data = SwapAssetInstructionData::new().try_to_vec().unwrap();
 
         let instruction = solana_program::instruction::Instruction {
             program_id: crate::MONOSWAP_ID,
@@ -372,7 +367,7 @@ impl<'a, 'b> SwapNiftyCpi<'a, 'b> {
         if let Some(incoming_asset_group) = self.incoming_asset_group {
             account_infos.push(incoming_asset_group.clone());
         }
-        account_infos.push(self.nifty_asset_program.clone());
+        account_infos.push(self.asset_program.clone());
         remaining_accounts
             .iter()
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
@@ -385,7 +380,7 @@ impl<'a, 'b> SwapNiftyCpi<'a, 'b> {
     }
 }
 
-/// Instruction builder for `SwapNifty` via CPI.
+/// Instruction builder for `SwapAsset` via CPI.
 ///
 /// ### Accounts:
 ///
@@ -395,14 +390,14 @@ impl<'a, 'b> SwapNiftyCpi<'a, 'b> {
 ///   3. `[writable]` incoming_asset
 ///   4. `[writable, optional]` escrowed_asset_group
 ///   5. `[writable, optional]` incoming_asset_group
-///   6. `[]` nifty_asset_program
-pub struct SwapNiftyCpiBuilder<'a, 'b> {
-    instruction: Box<SwapNiftyCpiBuilderInstruction<'a, 'b>>,
+///   6. `[]` asset_program
+pub struct SwapAssetCpiBuilder<'a, 'b> {
+    instruction: Box<SwapAssetCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> SwapNiftyCpiBuilder<'a, 'b> {
+impl<'a, 'b> SwapAssetCpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
-        let instruction = Box::new(SwapNiftyCpiBuilderInstruction {
+        let instruction = Box::new(SwapAssetCpiBuilderInstruction {
             __program: program,
             authority: None,
             swap_marker: None,
@@ -410,7 +405,7 @@ impl<'a, 'b> SwapNiftyCpiBuilder<'a, 'b> {
             incoming_asset: None,
             escrowed_asset_group: None,
             incoming_asset_group: None,
-            nifty_asset_program: None,
+            asset_program: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
@@ -471,13 +466,13 @@ impl<'a, 'b> SwapNiftyCpiBuilder<'a, 'b> {
         self.instruction.incoming_asset_group = incoming_asset_group;
         self
     }
-    /// Nifty asset program account
+    /// Asset program account
     #[inline(always)]
-    pub fn nifty_asset_program(
+    pub fn asset_program(
         &mut self,
-        nifty_asset_program: &'b solana_program::account_info::AccountInfo<'a>,
+        asset_program: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
-        self.instruction.nifty_asset_program = Some(nifty_asset_program);
+        self.instruction.asset_program = Some(asset_program);
         self
     }
     /// Add an additional account to the instruction.
@@ -521,7 +516,7 @@ impl<'a, 'b> SwapNiftyCpiBuilder<'a, 'b> {
         &self,
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
-        let instruction = SwapNiftyCpi {
+        let instruction = SwapAssetCpi {
             __program: self.instruction.__program,
 
             authority: self.instruction.authority.expect("authority is not set"),
@@ -545,10 +540,10 @@ impl<'a, 'b> SwapNiftyCpiBuilder<'a, 'b> {
 
             incoming_asset_group: self.instruction.incoming_asset_group,
 
-            nifty_asset_program: self
+            asset_program: self
                 .instruction
-                .nifty_asset_program
-                .expect("nifty_asset_program is not set"),
+                .asset_program
+                .expect("asset_program is not set"),
         };
         instruction.invoke_signed_with_remaining_accounts(
             signers_seeds,
@@ -557,7 +552,7 @@ impl<'a, 'b> SwapNiftyCpiBuilder<'a, 'b> {
     }
 }
 
-struct SwapNiftyCpiBuilderInstruction<'a, 'b> {
+struct SwapAssetCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     swap_marker: Option<&'b solana_program::account_info::AccountInfo<'a>>,
@@ -565,7 +560,7 @@ struct SwapNiftyCpiBuilderInstruction<'a, 'b> {
     incoming_asset: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     escrowed_asset_group: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     incoming_asset_group: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    nifty_asset_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    asset_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
         &'b solana_program::account_info::AccountInfo<'a>,

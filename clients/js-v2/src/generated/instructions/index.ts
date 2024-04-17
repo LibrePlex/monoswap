@@ -7,6 +7,6 @@
  */
 
 export * from './createSwap';
-export * from './swapNifty';
-export * from './swapNiftySPL';
+export * from './swapAsset';
+export * from './swapAssetSPL';
 export * from './swapSPL';

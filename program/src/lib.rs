@@ -3,6 +3,7 @@ pub mod asset_detection;
 pub mod entrypoint;
 pub mod error;
 pub mod instruction;
+pub mod interface;
 pub mod processor;
 pub mod state;
 pub mod transfer;
